@@ -1,4 +1,3 @@
-import pytest
 from ai_engine.utils.sanitizer import sanitize_logs
 
 

@@ -1,5 +1,4 @@
 import pytest
-import os
 from unittest.mock import patch, MagicMock
 from google.genai.errors import APIError
 from google.genai.types import GenerateContentResponse

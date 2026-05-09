@@ -8,7 +8,7 @@ from pydantic import ValidationError
 # Ensure project root is in PYTHONPATH
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from ai_engine.models.failure import FailurePayload, FailureSeverity
+from ai_engine.models.failure import FailurePayload
 from ai_engine.models.responses import GeminiDiagnosisOutput, AIDiagnosisResponse
 from ai_engine.prompts.templates import PromptBuilder
 from ai_engine.client import GeminiClient
@@ -113,7 +113,7 @@ def main():
     # Save human-readable markdown
     output_md_path = "ai_diagnosis_report.md"
     with open(output_md_path, "w", encoding="utf-8") as f:
-        f.write(f"# AutoHeal Diagnosis Report\n\n")
+        f.write("# AutoHeal Diagnosis Report\n\n")
         f.write(f"**Root Cause**: {final_diagnosis.root_cause}\n\n")
         f.write(f"**Severity**: {final_diagnosis.severity.value.upper()}\n")
         f.write(f"**Confidence**: {final_diagnosis.confidence_score}%\n\n")

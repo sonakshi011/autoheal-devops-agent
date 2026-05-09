@@ -1,10 +1,8 @@
 import os
 import sys
 import argparse
-import json
 import logging
 from datetime import datetime
-from typing import Optional
 
 # Ensure project root is in PYTHONPATH when running as a standalone script
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
