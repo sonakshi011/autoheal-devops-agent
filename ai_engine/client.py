@@ -7,6 +7,7 @@ from google import genai
 from google.genai import types
 from google.genai.errors import APIError
 
+from app.config import settings
 from ai_engine.exceptions import AIClientError
 
 logger = logging.getLogger("autoheal.ai")
@@ -15,24 +16,31 @@ logger = logging.getLogger("autoheal.ai")
 class GeminiClient:
     """Client for interacting with the Google Gemini API with built-in retry logic."""
 
-    DEFAULT_MODEL = "gemini-2.0-flash"
-    COMPLEX_MODEL = "gemini-2.5-pro"
-
     def __init__(self, api_key: Optional[str] = None):
         """
         Initialize the Gemini Client.
-        Falls back to GEMINI_API_KEY environment variable if not provided.
+        Falls back to pydantic settings (which reads from .env) if not provided.
+        Model names are always read from settings — never hardcoded here.
         """
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+        self.api_key = api_key or settings.gemini_api_key
         if not self.api_key:
-            raise AIClientError("GEMINI_API_KEY is not set or provided.")
+            raise AIClientError("GEMINI_API_KEY is not set or provided in environment.")
 
+        self.default_model = settings.gemini_default_model
+        self.complex_model = settings.gemini_complex_model
         self.client = genai.Client(api_key=self.api_key)
+
+        # Safe startup log — shows model configuration but never the API key
+        logger.info(
+            f"GeminiClient initialised | environment={settings.environment} "
+            f"| default_model={self.default_model} "
+            f"| complex_model={self.complex_model}"
+        )
 
     def generate_content_with_retry(
         self,
         prompt: str,
-        model: str = DEFAULT_MODEL,
+        model: Optional[str] = None,
         max_retries: int = 3,
         system_instruction: Optional[str] = None,
         response_schema: Optional[Dict[str, Any]] = None,
@@ -40,7 +48,10 @@ class GeminiClient:
     ) -> str:
         """
         Generate content using Gemini API with exponential backoff retry logic.
+        If model is not specified, falls back to settings.gemini_default_model.
         """
+        # Resolve model at call-time so it always reflects current settings
+        model = model or self.default_model
         attempt = 0
         backoff_times = [1, 2, 4]  # seconds
 

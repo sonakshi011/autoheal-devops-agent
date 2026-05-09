@@ -16,7 +16,7 @@ def mock_genai_client():
 
 
 def test_client_init_no_api_key():
-    with patch.dict(os.environ, clear=True):
+    with patch("ai_engine.client.settings.gemini_api_key", None):
         with pytest.raises(AIClientError, match="GEMINI_API_KEY is not set"):
             GeminiClient()
 
@@ -24,6 +24,13 @@ def test_client_init_no_api_key():
 def test_client_init_with_api_key():
     client = GeminiClient(api_key="test_key")
     assert client.api_key == "test_key"
+
+
+def test_client_model_comes_from_settings():
+    """default_model must reflect settings, not a hardcoded constant."""
+    with patch("ai_engine.client.settings.gemini_default_model", "gemini-custom-test"):
+        client = GeminiClient(api_key="test_key")
+        assert client.default_model == "gemini-custom-test"
 
 
 def test_generate_content_success(mock_genai_client):

@@ -1,0 +1,77 @@
+name: AI Failure Analyzer Orchestration
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+permissions:
+  actions: read   # Required to download logs
+  contents: read  # Required to checkout the repo
+  # We do NOT request pull-requests: write or issues: write in this phase
+  # to maintain least-privilege boundaries until the AI engine is actively integrated.
+
+jobs:
+  capture-and-diagnose:
+    # Only trigger if the target workflow actually failed
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pydantic jinja2
+          
+      - name: Download failing workflow logs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const run_id = context.payload.workflow_run.id;
+            const log_data = await github.rest.actions.downloadWorkflowRunLogs({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run_id,
+            });
+            fs.writeFileSync('workflow_logs.zip', Buffer.from(log_data.data));
+            
+      - name: Extract Logs
+        run: |
+          unzip workflow_logs.zip -d extracted_logs
+          # For Phase 2B, we concatenate all logs into a single text file
+          cat extracted_logs/**/*.txt > raw_failure_logs.txt || true
+          
+      - name: Execute log capture and sanitization
+        env:
+          GITHUB_REF_NAME: ${{ github.event.workflow_run.head_branch }}
+          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUNNER_OS: ${{ runner.os }}
+        run: |
+          python scripts/capture_logs.py \
+            --file raw_failure_logs.txt \
+            --workflow "${{ github.event.workflow_run.name }}" \
+            --output failure_payload.json
+
+      - name: Execute analysis orchestrator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python scripts/analyze_failure.py failure_payload.json
+
+      - name: Upload sanitized failure payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-failure-payload
+          path: |
+            failure_payload.json
+            ai_ready_prompt.txt
+          retention-days: 7

@@ -1,0 +1,15 @@
+{
+    "workflow_name": "CI Pipeline",
+    "job_name": "Unit Tests",
+    "step_name": "Run pytest",
+    "exit_code": 1,
+    "timestamp": "2026-05-09T11:30:00Z",
+    "logs": "ModuleNotFoundError: No module named 'pytest'",
+    "branch": "main",
+    "commit_sha": "abc123def456",
+    "repository": "autoheal-devops-agent",
+    "runner_os": "ubuntu-latest",
+    "python_version": "3.12",
+    "failure_type": "dependency_error",
+    "severity": "high"
+}
