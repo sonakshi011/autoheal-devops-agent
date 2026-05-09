@@ -12,6 +12,7 @@ app = FastAPI(
 app.add_middleware(LoggingMiddleware)
 app.include_router(health.router)
 
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to AutoHeal DevOps Agent API"}

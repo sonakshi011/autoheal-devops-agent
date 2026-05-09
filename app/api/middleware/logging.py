@@ -5,6 +5,7 @@ from fastapi import Request
 
 logger = logging.getLogger("autoheal.api")
 
+
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         start_time = time.time()
