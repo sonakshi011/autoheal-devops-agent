@@ -42,7 +42,7 @@ def test_generate_content_success(mock_genai_client):
 @patch("ai_engine.client.time.sleep")
 def test_generate_content_retry_on_429(mock_sleep, mock_genai_client):
     # Setup mock to fail twice with 429, then succeed
-    mock_error = APIError("Too Many Requests", code=429)
+    mock_error = APIError(code=429, response_json={"error": "Too Many Requests"})
 
     mock_success = MagicMock(spec=GenerateContentResponse)
     mock_success.text = '{"success": true}'
