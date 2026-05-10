@@ -2,7 +2,7 @@ import os
 import sys
 import argparse
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Ensure project root is in PYTHONPATH when running as a standalone script
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -129,7 +129,7 @@ def main():
         step_name=args.step,
         exit_code=args.exit_code,
         logs=processed_logs,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
         branch=os.getenv("GITHUB_REF_NAME"),
         commit_sha=os.getenv("GITHUB_SHA"),
         repository=os.getenv("GITHUB_REPOSITORY"),

@@ -1,3 +1,6 @@
+# AI Failure Analyzer Orchestration
+# This workflow listens for the completion of the 'CI Pipeline' and triggers a diagnosis if it fails.
+
 name: AI Failure Analyzer Orchestration
 
 on:
@@ -7,16 +10,19 @@ on:
       - completed
 
 permissions:
-  actions: read   # Required to download logs
-  contents: read  # Required to checkout the repo
-  # We do NOT request pull-requests: write or issues: write in this phase
-  # to maintain least-privilege boundaries until the AI engine is actively integrated.
+  actions: read   # Required to download failing run logs
+  contents: read  # Required to checkout the repo and read scripts
 
 jobs:
   capture-and-diagnose:
-    # Only trigger if the target workflow actually failed
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    # Trigger only if 'CI Pipeline' failed.
+    # Safety: Explicit name check prevents recursive loops if other workflows are added.
+    if: >
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.name == 'CI Pipeline'
+    
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,11 +31,19 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Log workflow context
+        run: |
+          echo "::notice::Triggered by: ${{ github.event.workflow_run.name }}"
+          echo "::notice::Failed run ID: ${{ github.event.workflow_run.id }}"
+          echo "::notice::Branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "::notice::Commit: ${{ github.event.workflow_run.head_sha }}"
           
-      - name: Install dependencies
+      - name: Install project dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pydantic jinja2
+          # We install full requirements to ensure analyze_failure.py has all imports (genai, pydantic, etc.)
+          pip install -r requirements.txt
           
       - name: Download failing workflow logs
         uses: actions/github-script@v7
@@ -47,8 +61,16 @@ jobs:
       - name: Extract Logs
         run: |
           unzip workflow_logs.zip -d extracted_logs
-          # For Phase 2B, we concatenate all logs into a single text file
+          # Concatenate all logs into a single text file
           cat extracted_logs/**/*.txt > raw_failure_logs.txt || true
+
+      - name: Validate extracted logs
+        run: |
+          if [ ! -s raw_failure_logs.txt ]; then
+            echo "::error::Extracted logs are empty. Cannot proceed with analysis."
+            exit 1
+          fi
+          echo "Log file size: $(wc -c < raw_failure_logs.txt) bytes"
           
       - name: Execute log capture and sanitization
         env:
@@ -67,11 +89,13 @@ jobs:
         run: |
           python scripts/analyze_failure.py failure_payload.json
 
-      - name: Upload sanitized failure payload
+      - name: Upload diagnosis artifacts
         uses: actions/upload-artifact@v4
+        if: always() # Always upload even if analysis failed (to see the payload)
         with:
-          name: ai-failure-payload
+          name: ai-failure-diagnosis
           path: |
             failure_payload.json
-            ai_ready_prompt.txt
+            ai_diagnosis.json
+            ai_diagnosis_report.md
           retention-days: 7
