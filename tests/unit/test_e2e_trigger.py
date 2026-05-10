@@ -1,5 +1,3 @@
-
-
 def test_intentional_failure_for_e2e_validation():
     """
     This test is intentionally designed to fail to trigger the
