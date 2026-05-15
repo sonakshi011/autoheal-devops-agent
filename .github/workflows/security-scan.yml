@@ -1,0 +1,114 @@
+name: Security & Scanning
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-scans:
+    name: Run Security Audits
+    runs-on: ubuntu-latest
+    timeout-minutes: 15 # Prevent hanging scans
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Security Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit pip-audit
+
+      - name: Run Bandit SAST
+        run: |
+          # Run bandit, format as sarif, do not fail workflow yet so other scans can run
+          bandit -r . -f sarif -o bandit-results.sarif -ll -c pyproject.toml || true
+
+      - name: Upload Bandit SARIF to Security Tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: bandit-results.sarif
+          category: bandit
+
+      - name: Run Dependency Audit
+        run: |
+          # We use || true so the pipeline continues to gather ALL reports.
+          # We will enforce failures at the end of the pipeline.
+          pip-audit -r requirements.txt -f json -o dependency-results.json || echo "PIP_AUDIT_FAILED=true" >> $GITHUB_ENV
+
+      - name: Build Docker Image
+        run: |
+          docker build -t autoheal-agent:local -f docker/Dockerfile .
+
+      - name: Run Trivy Filesystem Scan (JSON)
+        # Pinned to stable version for production safety
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'json'
+          output: 'trivy-fs-results.json'
+          # Exclude cache and virtual envs to speed up scan and reduce false positives
+          skip-dirs: '.venv,venv,__pycache__,.git,.pytest_cache,.ruff_cache'
+
+      - name: Run Trivy Image Scan (JSON)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'autoheal-agent:local'
+          format: 'json'
+          output: 'trivy-image-results.json'
+
+      - name: Upload Security Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-reports
+          # These strict deterministic filenames guarantee future AI engines 
+          # know exactly where to find the raw vulnerability contexts.
+          path: |
+            bandit-results.sarif
+            dependency-results.json
+            trivy-fs-results.json
+            trivy-image-results.json
+          retention-days: 7
+
+      # --- ENFORCEMENT STAGE ---
+      # We separate scanning from enforcement. This ensures that even if one scan fails,
+      # ALL scans execute and their artifacts are uploaded for AI ingestion.
+
+      - name: Enforce Dependency Security
+        if: always()
+        run: |
+          if [ "$PIP_AUDIT_FAILED" = "true" ]; then
+            echo "::error::Critical dependency vulnerabilities found in requirements.txt"
+            exit 1
+          fi
+
+      - name: Enforce Trivy FS Severity
+        if: always()
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'HIGH,CRITICAL'
+          skip-dirs: '.venv,venv,__pycache__,.git,.pytest_cache,.ruff_cache'
+          exit-code: 1
+
+      - name: Enforce Trivy Image Severity
+        if: always()
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'autoheal-agent:local'
+          severity: 'HIGH,CRITICAL'
+          exit-code: 1
