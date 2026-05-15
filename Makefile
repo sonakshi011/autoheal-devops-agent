@@ -15,4 +15,8 @@ lint:
 format:
 	ruff format .
 
+fix:
+	ruff check --fix .
+	ruff format .
+
 check: lint test
