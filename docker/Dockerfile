@@ -39,6 +39,8 @@ COPY app/ ./app/
 COPY ai_engine/ ./ai_engine/
 COPY prompts/ ./prompts/
 
+RUN chown -R appgroup:appgroup /app
+
 # Switch to non-root user
 USER appgroup
 
