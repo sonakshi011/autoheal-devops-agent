@@ -7,6 +7,10 @@ WORKDIR /build
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
+# Harden: Upgrade OS packages to patch base-image CVEs
+RUN apt-get update && apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN pip install --no-cache-dir --upgrade pip
 
 COPY requirements.txt .
@@ -21,12 +25,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app
 
-# Create non-root user
-RUN addgroup --system appgroup && adduser --system --group appgroup
+# Harden: Upgrade OS packages, clean up, and create non-root user
+RUN apt-get update && apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    addgroup --system appgroup && adduser --system --group appgroup
 
 # Install dependencies from wheels
 COPY --from=builder /build/wheels /wheels
-RUN pip install --no-cache /wheels/*
+RUN pip install --no-cache-dir /wheels/* 
 
 # Copy application code
 COPY app/ ./app/
@@ -36,9 +42,9 @@ COPY prompts/ ./prompts/
 # Switch to non-root user
 USER appgroup
 
-# Health check
+# Harden: Native Python health check (removes curl dependency)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health/ || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')" || exit 1
 
 EXPOSE 8000
 

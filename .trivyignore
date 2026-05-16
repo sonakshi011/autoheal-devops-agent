@@ -1,0 +1,13 @@
+# .trivyignore
+# This file contains a strict list of unavoidable vulnerabilities that Trivy should ignore.
+# DO NOT add CVEs here unless they meet the following criteria:
+# 1. The vulnerability originates from a base OS package (e.g., glibc, kernel components).
+# 2. The upstream maintainer (e.g., Debian Security Team) has marked it as "Will Not Fix" 
+#    or "No Patch Available".
+# 3. There is no viable mitigation strategy.
+#
+# FORMAT:
+# <CVE-ID> # <Justification and link to upstream tracker>
+#
+# EXAMPLE:
+# CVE-2023-XXXXX # Ignored by Debian: https://security-tracker.debian.org/tracker/CVE-2023-XXXXX
