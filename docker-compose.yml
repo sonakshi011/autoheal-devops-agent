@@ -1,8 +1,12 @@
-version: '3.8'
+# AutoHeal DevOps Agent — Production Observability Stack
+# Compose spec: https://docs.docker.com/compose/compose-file/
+# No `version:` key — modern Compose spec (Docker Desktop 4.20+)
 
 services:
+
+  # ─── Application ─────────────────────────────────────────────────────────────
   app:
-    build: 
+    build:
       context: .
       dockerfile: docker/Dockerfile
     container_name: autoheal-api
@@ -15,51 +19,128 @@ services:
     networks:
       - autoheal-net
     restart: unless-stopped
+    # Exec-form CMD healthcheck — distroless has no shell, so we call the venv
+    # python binary directly. No CMD-SHELL is needed; Python raises an exception
+    # on HTTP failure which exits non-zero, satisfying Docker's health engine.
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      test: ["CMD", "/app/venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
+      start_period: 10s
+    labels:
+      com.docker.compose.project: "autoheal-devops-agent"
 
+  # ─── Prometheus ──────────────────────────────────────────────────────────────
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.53.0
     container_name: autoheal-prometheus
     volumes:
-      - ./monitoring/prometheus:/etc/prometheus
+      - ./monitoring/prometheus:/etc/prometheus:ro
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle"
     ports:
       - "9090:9090"
     networks:
       - autoheal-net
     restart: unless-stopped
+    # wget ships in the official Prometheus image — no extra tooling needed.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      app:
+        condition: service_healthy
 
+  # ─── Loki ────────────────────────────────────────────────────────────────────
+  loki:
+    image: grafana/loki:3.0.0
+    container_name: autoheal-loki
+    volumes:
+      - ./monitoring/loki:/etc/loki:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/loki-config.yml
+    expose:
+      - "3100"
+    networks:
+      - autoheal-net
+    restart: unless-stopped
+    # Loki exposes a /ready endpoint; wget is bundled in the grafana/loki image.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3100/ready || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ─── Promtail ────────────────────────────────────────────────────────────────
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: autoheal-promtail
+    volumes:
+      - ./monitoring/promtail:/etc/promtail:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/promtail-config.yml
+    networks:
+      - autoheal-net
+    restart: unless-stopped
+    depends_on:
+      loki:
+        condition: service_healthy
+
+  # ─── Grafana ─────────────────────────────────────────────────────────────────
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.1.0
     container_name: autoheal-grafana
     volumes:
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - grafana_data:/var/lib/grafana
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+      # Password sourced exclusively from .env — never hardcoded
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD must be set in .env}
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/autoheal-overview.json
     ports:
       - "3000:3000"
     networks:
       - autoheal-net
-    depends_on:
-      - prometheus
     restart: unless-stopped
+    # Grafana's /api/health endpoint returns 200 when datasources are ready.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
 
+# ─── Persistent Volumes ────────────────────────────────────────────────────────
+volumes:
+  prometheus_data:
+    driver: local
+  loki_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# ─── Isolated Network ─────────────────────────────────────────────────────────
 networks:
   autoheal-net:
     driver: bridge
-
-volumes:
-  prometheus_data:
-  grafana_data:
+    name: autoheal-net
