@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  # External labels propagate to all time series for multi-cluster readiness
+  external_labels:
+    environment: "local"
+    project: "autoheal-devops-agent"
+
+scrape_configs:
+  # FastAPI application metrics
+  - job_name: "autoheal-api"
+    static_configs:
+      - targets: ["app:8000"]
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

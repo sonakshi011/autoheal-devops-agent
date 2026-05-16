@@ -1,0 +1,59 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: "docker-containers"
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+        filters:
+          - name: label
+            values: ["com.docker.compose.project"]
+    relabel_configs:
+      # Container name as label (e.g. /autoheal-api → autoheal-api)
+      - source_labels: ["__meta_docker_container_name"]
+        regex: "/(.*)"
+        target_label: "container"
+      # Docker Compose service name
+      - source_labels: ["__meta_docker_container_label_com_docker_compose_service"]
+        target_label: "service"
+      # Compose project name as environment
+      - source_labels: ["__meta_docker_container_label_com_docker_compose_project"]
+        target_label: "environment"
+      # Log stream (stdout / stderr)
+      - source_labels: ["__meta_docker_container_log_stream"]
+        target_label: "stream"
+
+    pipeline_stages:
+      # Attempt JSON parsing — safe: non-JSON lines pass through unchanged
+      - json:
+          expressions:
+            level: level
+            logger_name: logger_name
+            request_id: request_id
+            path: path
+            status_code: status_code
+            latency_ms: latency_ms
+
+      # Promote parsed JSON 'level' field to a Loki label for fast filtering.
+      # High-cardinality fields (request_id, path) are kept as structured
+      # metadata ONLY — never promoted to labels to prevent cardinality explosion.
+      - labels:
+          level:
+          logger_name:
+
+      # Drop health check poll logs to reduce noise volume (high-frequency, low-value)
+      - drop:
+          expression: '.*GET /health/.*'
+
+      # Set Loki timestamp from the structured log timestamp field
+      - timestamp:
+          source: timestamp
+          format: "2006-01-02T15:04:05Z"
