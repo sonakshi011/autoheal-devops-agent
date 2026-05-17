@@ -23,11 +23,11 @@ class Settings(BaseSettings):
     github_repository: Optional[str] = None
 
     # CORS configuration
-    allowed_origins_raw: str = "http://localhost:3000,http://127.0.0.1:3000"
+    allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
 
     @property
-    def allowed_origins(self) -> list[str]:
-        return [origin.strip() for origin in self.allowed_origins_raw.split(",") if origin.strip()]
+    def parsed_allowed_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.allowed_origins.split(",") if origin.strip()]
 
 
 settings = Settings()

@@ -27,20 +27,23 @@ export default function SecurityPage() {
         ]);
 
         const parsedVulnerabilities: TrivyVulnerability[] = [];
-        if (trivyRes.status === "fulfilled" && trivyRes.value?.Results) {
-          for (const target of trivyRes.value.Results) {
-            if (target.Vulnerabilities) {
-              for (const vuln of target.Vulnerabilities) {
-                parsedVulnerabilities.push({
-                  id: vuln.VulnerabilityID,
-                  pkgName: vuln.PkgName,
-                  installedVersion: vuln.InstalledVersion,
-                  fixedVersion: vuln.FixedVersion,
-                  severity: vuln.Severity,
-                  title: vuln.Title,
-                  description: vuln.Description,
-                  url: vuln.PrimaryURL,
-                });
+        if (trivyRes.status === "fulfilled" && trivyRes.value.success) {
+          const data = trivyRes.value.data;
+          if (data?.Results) {
+            for (const target of data.Results) {
+              if (target.Vulnerabilities) {
+                for (const vuln of target.Vulnerabilities) {
+                  parsedVulnerabilities.push({
+                    id: vuln.VulnerabilityID,
+                    pkgName: vuln.PkgName,
+                    installedVersion: vuln.InstalledVersion,
+                    fixedVersion: vuln.FixedVersion,
+                    severity: vuln.Severity,
+                    title: vuln.Title,
+                    description: vuln.Description,
+                    url: vuln.PrimaryURL,
+                  });
+                }
               }
             }
           }
@@ -48,25 +51,33 @@ export default function SecurityPage() {
         setTrivyData(parsedVulnerabilities);
 
         const parsedFindings: BanditFinding[] = [];
-        if (banditRes.status === "fulfilled" && banditRes.value?.runs?.[0]?.results) {
-          for (const result of banditRes.value.runs[0].results) {
-            const loc = result.locations?.[0]?.physicalLocation;
-            parsedFindings.push({
-              ruleId: result.ruleId,
-              message: result.message?.text || "",
-              file: loc?.artifactLocation?.uri || "Unknown",
-              line: loc?.region?.startLine || 0,
-              severity: result.properties?.issue_severity || "MEDIUM",
-              confidence: result.properties?.issue_confidence || "HIGH",
-              code: loc?.region?.snippet?.text || "",
-            });
+        if (banditRes.status === "fulfilled" && banditRes.value.success) {
+          const data = banditRes.value.data;
+          if (data?.runs?.[0]?.results) {
+            for (const result of data.runs[0].results) {
+              const loc = result.locations?.[0]?.physicalLocation;
+              parsedFindings.push({
+                ruleId: result.ruleId,
+                message: result.message?.text || "",
+                file: loc?.artifactLocation?.uri || "Unknown",
+                line: loc?.region?.startLine || 0,
+                severity: result.properties?.issue_severity || "MEDIUM",
+                confidence: result.properties?.issue_confidence || "HIGH",
+                code: loc?.region?.snippet?.text || "",
+              });
+            }
           }
         }
         setBanditData(parsedFindings);
 
-        // If both failed, show global error
-        if (trivyRes.status === "rejected" && banditRes.status === "rejected") {
-          throw new Error("Both Trivy and Bandit scan reports are missing from the reports directory.");
+        // If both failed (rejected or returned success=false), show global error
+        const trivyFailed = trivyRes.status === "rejected" || !trivyRes.value.success;
+        const banditFailed = banditRes.status === "rejected" || !banditRes.value.success;
+        if (trivyFailed && banditFailed) {
+          const trivyErr = (trivyRes.status === "fulfilled" && !trivyRes.value.success) ? trivyRes.value.error : "";
+          const banditErr = (banditRes.status === "fulfilled" && !banditRes.value.success) ? banditRes.value.error : "";
+          const errMsg = trivyErr || banditErr || "Both Trivy and Bandit scan reports are missing from the reports directory.";
+          throw new Error(errMsg);
         }
       } catch (err: any) {
         setError(err.message || "Failed to load security scan details.");

@@ -17,8 +17,12 @@ export default function AIAnalysisPage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchFromBackend<AIDiagnosis>("/api/v1/ai/latest-diagnosis");
-        setDiagnosis(data);
+        const res = await fetchFromBackend<AIDiagnosis>("/api/v1/ai/latest-diagnosis");
+        if (res.success) {
+          setDiagnosis(res.data);
+        } else {
+          setError(res.error || "No AI diagnosis report is active in the reports directory.");
+        }
       } catch (err: any) {
         setError(err.message || "No AI diagnosis report is active in the reports directory.");
       } finally {

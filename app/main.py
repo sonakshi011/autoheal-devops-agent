@@ -46,10 +46,10 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
 
-# Dynamic Allowed Origins parsed from settings.allowed_origins
+# Dynamic Allowed Origins parsed from settings.parsed_allowed_origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=settings.parsed_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

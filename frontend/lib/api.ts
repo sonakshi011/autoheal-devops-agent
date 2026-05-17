@@ -1,6 +1,8 @@
+import { APIResponse } from "@/types/api";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-export async function fetchFromBackend<T>(endpoint: string, options?: RequestInit): Promise<T> {
+export async function fetchFromBackend<T>(endpoint: string, options?: RequestInit): Promise<APIResponse<T>> {
   const url = `${API_BASE_URL}${endpoint}`;
   
   // Auth-ready design: inject authorization token seamlessly if present
@@ -20,13 +22,18 @@ export async function fetchFromBackend<T>(endpoint: string, options?: RequestIni
 
     const body = await response.json();
 
-    if (!response.ok || body.success === false) {
-      throw new Error(body.error || `API Request failed with status ${response.status}`);
-    }
-
-    return body.data as T;
+    return {
+      success: body.success ?? response.ok,
+      data: body.data,
+      error: body.error,
+      timestamp: body.timestamp || new Date().toISOString(),
+    } as APIResponse<T>;
   } catch (error: any) {
     console.error(`API Fetch Error [${url}]:`, error);
-    throw error;
+    return {
+      success: false,
+      error: error.message || "Failed to establish connection to AutoHeal core backend.",
+      timestamp: new Date().toISOString(),
+    } as APIResponse<T>;
   }
 }

@@ -16,8 +16,12 @@ export default function Dashboard() {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchFromBackend<PipelineRunsData>("/api/v1/pipelines/runs");
-        setPipelineData(data);
+        const res = await fetchFromBackend<PipelineRunsData>("/api/v1/pipelines/runs");
+        if (res.success) {
+          setPipelineData(res.data);
+        } else {
+          setError(res.error || "Failed to connect to AutoHeal core backend.");
+        }
       } catch (err: any) {
         setError(err.message || "Failed to connect to AutoHeal core backend.");
       } finally {
