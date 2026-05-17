@@ -16,6 +16,11 @@ services:
       - ENVIRONMENT=production
       - LOG_LEVEL=INFO
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+    volumes:
+      - ./reports:/app/reports
     networks:
       - autoheal-net
     restart: unless-stopped
@@ -23,7 +28,7 @@ services:
     # python binary directly. No CMD-SHELL is needed; Python raises an exception
     # on HTTP failure which exits non-zero, satisfying Docker's health engine.
     healthcheck:
-      test: ["CMD", "/app/venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      test: [ "CMD", "/app/venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')" ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -52,7 +57,7 @@ services:
     restart: unless-stopped
     # wget ships in the official Prometheus image — no extra tooling needed.
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy || exit 1"]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy || exit 1" ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -76,7 +81,7 @@ services:
     restart: unless-stopped
     # Loki exposes a /ready endpoint; wget is bundled in the grafana/loki image.
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3100/ready || exit 1"]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3100/ready || exit 1" ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -112,14 +117,18 @@ services:
       - GF_ANALYTICS_REPORTING_ENABLED=false
       - GF_ANALYTICS_CHECK_FOR_UPDATES=false
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/autoheal-overview.json
+      # Enable iframe embedding and anonymous access for the AutoHeal Control Panel
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     ports:
-      - "3000:3000"
+      - "3001:3000"
     networks:
       - autoheal-net
     restart: unless-stopped
     # Grafana's /api/health endpoint returns 200 when datasources are ready.
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1" ]
       interval: 30s
       timeout: 5s
       retries: 3

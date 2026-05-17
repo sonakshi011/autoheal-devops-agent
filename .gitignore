@@ -7,3 +7,6 @@ __pycache__/
 .env
 .coverage
 htmlcov/
+# Runtime generated reports
+reports/*.json
+reports/*.sarif

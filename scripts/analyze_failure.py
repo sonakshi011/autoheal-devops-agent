@@ -106,12 +106,12 @@ def main():
         final_diagnosis = generate_fallback_diagnosis(payload, str(e))
 
     # Save structured JSON
-    output_json_path = "ai_diagnosis.json"
+    output_json_path = "reports/ai_diagnosis.json"
     with open(output_json_path, "w", encoding="utf-8") as f:
         f.write(final_diagnosis.model_dump_json(indent=2))
 
     # Save human-readable markdown
-    output_md_path = "ai_diagnosis_report.md"
+    output_md_path = "reports/ai_diagnosis_report.md"
     with open(output_md_path, "w", encoding="utf-8") as f:
         f.write("# AutoHeal Diagnosis Report\n\n")
         f.write(f"**Root Cause**: {final_diagnosis.root_cause}\n\n")
