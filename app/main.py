@@ -22,30 +22,27 @@ app = FastAPI(
 
 # ─── Centralized Exception Handling ───────────────────────────────────────────
 
+
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     error_resp = APIErrorResponse(error=str(exc.detail))
     return JSONResponse(
-        status_code=exc.status_code,
-        content=json.loads(error_resp.model_dump_json())
+        status_code=exc.status_code, content=json.loads(error_resp.model_dump_json())
     )
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     error_resp = APIErrorResponse(error=str(exc.errors()))
-    return JSONResponse(
-        status_code=422,
-        content=json.loads(error_resp.model_dump_json())
-    )
+    return JSONResponse(status_code=422, content=json.loads(error_resp.model_dump_json()))
+
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     # Log details will still be recorded by LoggingMiddleware
     error_resp = APIErrorResponse(error="An internal server error occurred.")
-    return JSONResponse(
-        status_code=500,
-        content=json.loads(error_resp.model_dump_json())
-    )
+    return JSONResponse(status_code=500, content=json.loads(error_resp.model_dump_json()))
+
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
 
