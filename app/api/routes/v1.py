@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.models.responses import APISuccessResponse
 from app.services.reports_service import ReportsService
 from app.services.github_service import GitHubService
+from app.services.monitoring_service import MonitoringService
 
 v1_router = APIRouter(prefix="/api/v1")
 
@@ -52,4 +53,11 @@ def get_trivy_scan():
 def get_pipeline_runs():
     """Delegates to GitHubService to get recent pipeline workflow runs."""
     data = GitHubService.get_workflow_runs()
+    return APISuccessResponse(data=data)
+
+
+@v1_router.get("/monitoring/summary", response_model=APISuccessResponse)
+def get_monitoring_summary():
+    """Gets the unified cloud-native monitoring metrics summary."""
+    data = MonitoringService.get_summary()
     return APISuccessResponse(data=data)
