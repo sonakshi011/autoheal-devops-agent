@@ -22,13 +22,15 @@ def test_centralized_error_handling_404():
             ],
             "is_mock": True,
         }
-        with patch("app.services.reports_service.os.path.exists", return_value=False):
-            response = client.get("/api/v1/ai/latest-diagnosis")
-            assert response.status_code == 404
-            data = response.json()
-            assert data["success"] is False
-            assert "error" in data
-            assert "timestamp" in data
+        with patch("app.services.reports_service.settings.github_token", None):
+            with patch("app.services.reports_service.settings.github_repository", None):
+                with patch("app.services.reports_service.os.path.exists", return_value=False):
+                    response = client.get("/api/v1/ai/latest-diagnosis")
+                    assert response.status_code == 404
+                    data = response.json()
+                    assert data["success"] is False
+                    assert "error" in data
+                    assert "timestamp" in data
 
 
 def test_latest_diagnosis_success_clear():

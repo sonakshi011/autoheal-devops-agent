@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: read
+  contents: write
   security-events: write
 
 jobs:
@@ -81,7 +81,41 @@ jobs:
             dependency-results.json
             trivy-fs-results.json
             trivy-image-results.json
-          retention-days: 7
+      - name: Deploy Reports to reports branch
+        if: always()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # Create a temp directory and copy files we want to persist with standard mapped names
+          mkdir -p temp_reports
+          cp bandit-results.sarif temp_reports/ || true
+          cp dependency-results.json temp_reports/ || true
+          cp trivy-fs-results.json temp_reports/trivy-results.json || true
+          cp trivy-image-results.json temp_reports/ || true
+          
+          # Clone the repository's reports branch, or create it if missing
+          git clone --depth 1 --branch reports https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git reports_repo || {
+            mkdir reports_repo
+            cd reports_repo
+            git init
+            git checkout -b reports
+            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            cd ..
+          }
+          
+          # Copy files under both reports/latest/ and reports/history/YYYY-MM-DD/
+          DATE_DIR=$(date +'%Y-%m-%d')
+          mkdir -p reports_repo/reports/latest
+          mkdir -p reports_repo/reports/history/$DATE_DIR
+          
+          cp -r temp_reports/* reports_repo/reports/latest/
+          cp -r temp_reports/* reports_repo/reports/history/$DATE_DIR/
+          
+          cd reports_repo
+          git add reports/
+          git commit -m "chore: update security reports [skip ci]" || echo "No changes to commit"
+          git push origin reports
 
       # --- ENFORCEMENT STAGE ---
       # We separate scanning from enforcement. This ensures that even if one scan fails,
