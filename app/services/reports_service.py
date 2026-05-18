@@ -29,10 +29,7 @@ class MemoryCache:
         return None
 
     def set(self, key: str, data: Any):
-        self.cache[key] = {
-            "data": data,
-            "timestamp": time.time()
-        }
+        self.cache[key] = {"data": data, "timestamp": time.time()}
 
 
 # Single global instance for lightweight, zero-dependency in-memory caching
@@ -56,9 +53,7 @@ class ReportsService:
         # --- LOCAL DEVELOPMENT FALLBACK MODE ---
         if not token or not repo_name:
             if not os.path.exists(file_path):
-                raise HTTPException(
-                    status_code=404, detail=f"Report file {filename} not found."
-                )
+                raise HTTPException(status_code=404, detail=f"Report file {filename} not found.")
 
             if os.path.getsize(file_path) > MAX_FILE_SIZE_BYTES:
                 raise HTTPException(
@@ -75,7 +70,9 @@ class ReportsService:
                     detail=f"Report file {filename} contains malformed JSON.",
                 )
             except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to read local report: {str(e)}")
+                raise HTTPException(
+                    status_code=500, detail=f"Failed to read local report: {str(e)}"
+                )
 
         # --- DEPLOYED CLOUD/LIVE MODE WITH CACHING & GRACEFUL FALLBACK ---
         cache_key = f"github_report:{filename}"
@@ -87,10 +84,7 @@ class ReportsService:
 
         # 2. Cache expired or missing -> Fetch dynamically from GitHub contents API
         url = f"https://api.github.com/repos/{repo_name}/contents/reports/latest/{filename}?ref=reports"
-        headers = {
-            "Authorization": f"token {token}",
-            "Accept": "application/vnd.github.v3.raw"
-        }
+        headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github.v3.raw"}
 
         try:
             response = requests.get(url, headers=headers, timeout=10)
@@ -126,7 +120,7 @@ class ReportsService:
                 )
 
             parsed_data = response.json()
-            
+
             # Cache successfully fetched response
             reports_cache.set(cache_key, parsed_data)
             return parsed_data
