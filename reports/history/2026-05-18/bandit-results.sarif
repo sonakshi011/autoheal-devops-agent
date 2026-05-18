@@ -38,13 +38,13 @@
       "invocations": [
         {
           "executionSuccessful": true,
-          "endTimeUtc": "2026-05-18T12:32:55Z"
+          "endTimeUtc": "2026-05-18T13:25:03Z"
         }
       ],
       "properties": {
         "metrics": {
           "_totals": {
-            "loc": 1041,
+            "loc": 1192,
             "nosec": 0,
             "skipped_tests": 0,
             "SEVERITY.UNDEFINED": 0,
@@ -304,7 +304,7 @@
             "CONFIDENCE.HIGH": 0
           },
           "./app/api/routes/v1.py": {
-            "loc": 37,
+            "loc": 43,
             "nosec": 0,
             "skipped_tests": 0,
             "SEVERITY.UNDEFINED": 0,
@@ -383,6 +383,19 @@
           },
           "./app/services/github_service.py": {
             "loc": 58,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./app/services/monitoring_service.py": {
+            "loc": 145,
             "nosec": 0,
             "skipped_tests": 0,
             "SEVERITY.UNDEFINED": 0,
