@@ -3,16 +3,16 @@
   "Trivy": {
     "Version": "0.70.0"
   },
-  "ReportID": "019e3afe-0b26-721f-81c8-1fff611d52ba",
-  "CreatedAt": "2026-05-18T12:09:48.070140328Z",
-  "ArtifactID": "sha256:355a29e22a70042f76f00b0cdfb423d27ebe54341b66e0c69dce48e1bce4444d",
+  "ReportID": "019e3b09-511d-7aa9-bcb0-7fdc14ac2b1f",
+  "CreatedAt": "2026-05-18T12:22:06.877699457Z",
+  "ArtifactID": "sha256:24dc6e2aa4fd98ef9d1b16f076602a08d23df535ebbdfa05e6b66d9ef1503e5f",
   "ArtifactName": ".",
   "ArtifactType": "repository",
   "Metadata": {
     "RepoURL": "https://github.com/sonakshi011/autoheal-devops-agent",
     "Branch": "main",
-    "Commit": "db5d7b6b982527bb30219acff51cc469e8e21701",
-    "CommitMsg": "fix: prevent vercel deployments on reports branch",
+    "Commit": "d9dda04901d6f40cc9a6552c773156d392f7d6f4",
+    "CommitMsg": "fix: disable vercel deployment for reports branch",
     "Author": "sonakshi011 \u003csonakshissharma01@gmail.com\u003e",
     "Committer": "sonakshi011 \u003csonakshissharma01@gmail.com\u003e"
   },
@@ -1327,7 +1327,7 @@
             "Name": "GitHub Security Advisory npm",
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
           },
-          "Fingerprint": "sha256:64151683abbcd004b3eca18356033b72254f6ff7ef2c2467f00f1ee8a6f32e83",
+          "Fingerprint": "sha256:b08b72b358d341a74e619d9b98390fd038da23a0f16dab9e88fc118fd75a717f",
           "Title": "postcss: PostCSS: Cross-Site Scripting (XSS) via improper escaping of style closing tags",
           "Description": "PostCSS takes a CSS file and provides an API to analyze and modify its rules by transforming the rules into an Abstract Syntax Tree. Versions prior to 8.5.10 do not escape `\u003c/style\u003e` sequences when stringifying CSS ASTs. When user-submitted CSS is parsed and re-stringified for embedding in HTML `\u003cstyle\u003e` tags, `\u003c/style\u003e` in CSS values breaks out of the style context, enabling XSS. Version 8.5.10 fixes the issue.",
           "Severity": "MEDIUM",
