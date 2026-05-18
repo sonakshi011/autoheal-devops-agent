@@ -128,5 +128,5 @@ jobs:
           
           cd reports_repo
           git add reports/
-          git commit -m "chore: update analysis reports [skip ci]" || echo "No changes to commit"
+          git commit -m "chore: update analysis reports [skip ci] [vercel skip]" || echo "No changes to commit"
           git push origin reports
