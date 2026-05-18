@@ -3,16 +3,16 @@
   "Trivy": {
     "Version": "0.70.0"
   },
-  "ReportID": "019e3add-edd9-7944-ae63-a370e330167e",
-  "CreatedAt": "2026-05-18T11:34:43.417609286Z",
-  "ArtifactID": "sha256:332cb5ba7bbe2921a78d8b2c08436cb3aca903bd089646c84cf0b3ea5526da40",
+  "ReportID": "019e3ae4-5560-75ed-a4d6-6c9605d88334",
+  "CreatedAt": "2026-05-18T11:41:43.136390848Z",
+  "ArtifactID": "sha256:6ead230087e2bfce33c8395214fcdb533517ed286703d7392eab46cb93387bb5",
   "ArtifactName": ".",
   "ArtifactType": "repository",
   "Metadata": {
     "RepoURL": "https://github.com/sonakshi011/autoheal-devops-agent",
     "Branch": "main",
-    "Commit": "b06d4337633154e6f3d7ff3e0a206caaabacbafb",
-    "CommitMsg": "feat: implement production-grade report ingestion architecture",
+    "Commit": "d2341182c30cdb6286d07a8a9497e7d3616f5a13",
+    "CommitMsg": "style: format reports service",
     "Author": "sonakshi011 \u003csonakshissharma01@gmail.com\u003e",
     "Committer": "sonakshi011 \u003csonakshissharma01@gmail.com\u003e"
   },
@@ -1327,7 +1327,7 @@
             "Name": "GitHub Security Advisory npm",
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
           },
-          "Fingerprint": "sha256:553d05f66114e6aef6dfc14a4c8a730518f2dbbed814471a9f02e924181ac7ef",
+          "Fingerprint": "sha256:81867b38599495635398cdac1dc2206f4c56f7c0efaeb659a989157b77576266",
           "Title": "postcss: PostCSS: Cross-Site Scripting (XSS) via improper escaping of style closing tags",
           "Description": "PostCSS takes a CSS file and provides an API to analyze and modify its rules by transforming the rules into an Abstract Syntax Tree. Versions prior to 8.5.10 do not escape `\u003c/style\u003e` sequences when stringifying CSS ASTs. When user-submitted CSS is parsed and re-stringified for embedding in HTML `\u003cstyle\u003e` tags, `\u003c/style\u003e` in CSS values breaks out of the style context, enabling XSS. Version 8.5.10 fixes the issue.",
           "Severity": "MEDIUM",
