@@ -38,13 +38,13 @@
       "invocations": [
         {
           "executionSuccessful": true,
-          "endTimeUtc": "2026-05-18T13:25:03Z"
+          "endTimeUtc": "2026-05-18T13:28:25Z"
         }
       ],
       "properties": {
         "metrics": {
           "_totals": {
-            "loc": 1192,
+            "loc": 1208,
             "nosec": 0,
             "skipped_tests": 0,
             "SEVERITY.UNDEFINED": 0,
@@ -395,7 +395,7 @@
             "CONFIDENCE.HIGH": 0
           },
           "./app/services/monitoring_service.py": {
-            "loc": 145,
+            "loc": 161,
             "nosec": 0,
             "skipped_tests": 0,
             "SEVERITY.UNDEFINED": 0,
