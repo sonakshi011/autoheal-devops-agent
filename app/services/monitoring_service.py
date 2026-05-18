@@ -69,7 +69,7 @@ class MonitoringService:
         # 1. Pipeline Health & Incidents from GitHub Workflow runs
         runs_data = GitHubService.get_workflow_runs()
         runs = runs_data.get("runs", [])
-        
+
         total_runs = len(runs)
         success_count = 0
         failure_count = 0
@@ -81,13 +81,15 @@ class MonitoringService:
                 success_count += 1
             elif conclusion == "failure":
                 failure_count += 1
-                incidents.append({
-                    "id": run.get("id"),
-                    "name": run.get("name"),
-                    "conclusion": conclusion,
-                    "created_at": run.get("created_at") or run.get("run_started_at"),
-                    "url": run.get("html_url")
-                })
+                incidents.append(
+                    {
+                        "id": run.get("id"),
+                        "name": run.get("name"),
+                        "conclusion": conclusion,
+                        "created_at": run.get("created_at") or run.get("run_started_at"),
+                        "url": run.get("html_url"),
+                    }
+                )
 
         success_rate = 100.0
         if (success_count + failure_count) > 0:
@@ -131,15 +133,23 @@ class MonitoringService:
             logger.debug(f"Could not load Bandit report for monitoring metrics: {str(e)}")
 
         # 3. AI Incident Telemetry
-        active_diagnoses = 1 if failure_count > 0 and len(incidents) > 0 and incidents[0]["id"] == (runs[0].get("id") if runs else None) else 0
-        
+        active_diagnoses = (
+            1
+            if failure_count > 0
+            and len(incidents) > 0
+            and incidents[0]["id"] == (runs[0].get("id") if runs else None)
+            else 0
+        )
+
         # 4. Aggregated Prometheus request metrics
         api_metrics = cls.get_system_metrics()
 
         # 5. Pipeline overall status
         pipeline_status = "Healthy"
         if failure_count > 0:
-            pipeline_status = "Action Required" if runs and runs[0].get("conclusion") == "failure" else "Warning"
+            pipeline_status = (
+                "Action Required" if runs and runs[0].get("conclusion") == "failure" else "Warning"
+            )
 
         return {
             "pipeline_health": {
@@ -156,16 +166,22 @@ class MonitoringService:
                 "medium_count": medium_count,
                 "low_count": low_count,
                 "sast_findings": sast_findings,
-                "status": "Healthy" if total_vulnerabilities == 0 and sast_findings == 0 else "Action Required" if critical_count + high_count > 0 else "Warning",
+                "status": "Healthy"
+                if total_vulnerabilities == 0 and sast_findings == 0
+                else "Action Required"
+                if critical_count + high_count > 0
+                else "Warning",
             },
             "ai_telemetry": {
                 "active_diagnoses": active_diagnoses,
-                "last_diagnosis_status": "Active failure analysis running" if active_diagnoses > 0 else "System fully operational",
+                "last_diagnosis_status": "Active failure analysis running"
+                if active_diagnoses > 0
+                else "System fully operational",
             },
             "api_metrics": api_metrics,
             "recent_incidents": incidents[:5],  # Limit to latest 5 failures
             "deployment_status": {
                 "environment": settings.environment,
                 "status": "Active",
-            }
+            },
         }
