@@ -3,9 +3,9 @@
   "Trivy": {
     "Version": "0.70.0"
   },
-  "ReportID": "019e3b6e-8aa8-79fa-97b2-cb6d38f957f2",
-  "CreatedAt": "2026-05-18T14:12:40.744655127Z",
-  "ArtifactID": "sha256:4cfe2111e22c708974637f7e4f26ef3fc45106d62f3a0d428443f1bc5423d867",
+  "ReportID": "019e3b74-becd-7a81-9c40-076b05f2d09c",
+  "CreatedAt": "2026-05-18T14:19:27.309689627Z",
+  "ArtifactID": "sha256:867dc19aaebeee24301149406a209824d3190d0e562ba972b70acf7f5e654fa9",
   "ArtifactName": "autoheal-agent:local",
   "ArtifactType": "container_image",
   "Metadata": {
@@ -14,7 +14,7 @@
       "Family": "wolfi",
       "Name": "20230201"
     },
-    "ImageID": "sha256:c5bbb8a8796ec7b52978887f9d224dfaf829221948979d894cbea1bfa3a74cbf",
+    "ImageID": "sha256:34a62fe6189f48246fdbc48e26232d6a104daf5fc036cf98a38a1793a75dd57c",
     "DiffIDs": [
       "sha256:d9222aef67c3f575a84dc23bbd9a3c2eb47cbc71ff7351f5a23e5885decd1c30",
       "sha256:f11fd671e779cce250907410910e28992aa53539ab2a0975ac56dade8038383c",
@@ -27,11 +27,11 @@
       "sha256:fe2d79f38224db6597d1fb82f5753c2a42c091ed4920aa55f600419498c997bb",
       "sha256:0540e13d777173ee3e9e8b0d73ce51aad0f328a555e9df1b082f03c9ab08e383",
       "sha256:4ac30a536a65ae64f62bd12b5d814bbdc227823a57608caf5fd5bf02304acbb0",
-      "sha256:32e2e08ea7c9fb7f0560e331f92520822d5116d4e63872f56f08f9221632e931",
-      "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292",
-      "sha256:b368f61d8ea61a52c4a8b02433f32118a1c56b976f7be2b85e7c3ee1951a48c4",
-      "sha256:4ccf4630a8e69fe914ce438907f37980d155ed2efe86554c12aa3b029fb60a0c",
-      "sha256:512315a309935daf60916b6ada63fd320e9295f74abe08ca4cfb18627c1e3f9e"
+      "sha256:0ce33a2cedccc3409c3cb6030dbb841ff55a33284b92e1ebab437940d98aceec",
+      "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3",
+      "sha256:ff1e3f7ebc017ae08ff8074101fc90e90113bddb5e944ec6ab09ea5cb2fb32a8",
+      "sha256:e86422b7b200de17b3400e6909eaaae52b0af64ab0711541169e4065b3fe03ce",
+      "sha256:349f626db1698cb857489f708787b6cce7bc9e888643e2ebb86623aaefedad4c"
     ],
     "RepoTags": [
       "autoheal-agent:local"
@@ -40,7 +40,7 @@
     "ImageConfig": {
       "architecture": "amd64",
       "author": "github.com/chainguard-dev/apko",
-      "created": "2026-05-18T14:12:18.433934999Z",
+      "created": "2026-05-18T14:18:58.431039518Z",
       "history": [
         {
           "created": "2026-05-17T02:37:03Z",
@@ -98,56 +98,56 @@
           "comment": "python by Chainguard"
         },
         {
-          "created": "2026-05-18T14:12:04Z",
+          "created": "2026-05-18T14:18:41Z",
           "created_by": "WORKDIR /app",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-05-18T14:12:18Z",
+          "created": "2026-05-18T14:18:58Z",
           "created_by": "ENV PYTHONUNBUFFERED=1 PYTHONPATH=/app PATH=/app/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-05-18T14:12:18Z",
+          "created": "2026-05-18T14:18:58Z",
           "created_by": "COPY /app/venv /app/venv # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-05-18T14:12:18Z",
+          "created": "2026-05-18T14:18:58Z",
           "created_by": "COPY app/ ./app/ # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-05-18T14:12:18Z",
+          "created": "2026-05-18T14:18:58Z",
           "created_by": "COPY ai_engine/ ./ai_engine/ # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-05-18T14:12:18Z",
+          "created": "2026-05-18T14:18:58Z",
           "created_by": "COPY prompts/ ./prompts/ # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-05-18T14:12:18Z",
+          "created": "2026-05-18T14:18:58Z",
           "created_by": "HEALTHCHECK \u0026{[\"CMD\" \"/app/venv/bin/python\" \"-c\" \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')\"] \"30s\" \"3s\" \"5s\" \"0s\" '\\x03'}",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-05-18T14:12:18Z",
+          "created": "2026-05-18T14:18:58Z",
           "created_by": "EXPOSE map[8000/tcp:{}]",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-05-18T14:12:18Z",
+          "created": "2026-05-18T14:18:58Z",
           "created_by": "ENTRYPOINT []",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-05-18T14:12:18Z",
+          "created": "2026-05-18T14:18:58Z",
           "created_by": "CMD [\"/app/venv/bin/uvicorn\" \"app.main:app\" \"--host\" \"0.0.0.0\" \"--port\" \"8000\"]",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
@@ -168,11 +168,11 @@
           "sha256:fe2d79f38224db6597d1fb82f5753c2a42c091ed4920aa55f600419498c997bb",
           "sha256:0540e13d777173ee3e9e8b0d73ce51aad0f328a555e9df1b082f03c9ab08e383",
           "sha256:4ac30a536a65ae64f62bd12b5d814bbdc227823a57608caf5fd5bf02304acbb0",
-          "sha256:32e2e08ea7c9fb7f0560e331f92520822d5116d4e63872f56f08f9221632e931",
-          "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292",
-          "sha256:b368f61d8ea61a52c4a8b02433f32118a1c56b976f7be2b85e7c3ee1951a48c4",
-          "sha256:4ccf4630a8e69fe914ce438907f37980d155ed2efe86554c12aa3b029fb60a0c",
-          "sha256:512315a309935daf60916b6ada63fd320e9295f74abe08ca4cfb18627c1e3f9e"
+          "sha256:0ce33a2cedccc3409c3cb6030dbb841ff55a33284b92e1ebab437940d98aceec",
+          "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3",
+          "sha256:ff1e3f7ebc017ae08ff8074101fc90e90113bddb5e944ec6ab09ea5cb2fb32a8",
+          "sha256:e86422b7b200de17b3400e6909eaaae52b0af64ab0711541169e4065b3fe03ce",
+          "sha256:349f626db1698cb857489f708787b6cce7bc9e888643e2ebb86623aaefedad4c"
         ]
       },
       "config": {
@@ -267,23 +267,23 @@
       },
       {
         "Size": 1536,
-        "DiffID": "sha256:32e2e08ea7c9fb7f0560e331f92520822d5116d4e63872f56f08f9221632e931"
+        "DiffID": "sha256:0ce33a2cedccc3409c3cb6030dbb841ff55a33284b92e1ebab437940d98aceec"
       },
       {
         "Size": 99905024,
-        "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+        "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
       },
       {
         "Size": 47104,
-        "DiffID": "sha256:b368f61d8ea61a52c4a8b02433f32118a1c56b976f7be2b85e7c3ee1951a48c4"
+        "DiffID": "sha256:ff1e3f7ebc017ae08ff8074101fc90e90113bddb5e944ec6ab09ea5cb2fb32a8"
       },
       {
         "Size": 25600,
-        "DiffID": "sha256:4ccf4630a8e69fe914ce438907f37980d155ed2efe86554c12aa3b029fb60a0c"
+        "DiffID": "sha256:e86422b7b200de17b3400e6909eaaae52b0af64ab0711541169e4065b3fe03ce"
       },
       {
         "Size": 7680,
-        "DiffID": "sha256:512315a309935daf60916b6ada63fd320e9295f74abe08ca4cfb18627c1e3f9e"
+        "DiffID": "sha256:349f626db1698cb857489f708787b6cce7bc9e888643e2ebb86623aaefedad4c"
       }
     ]
   },
@@ -2789,7 +2789,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/jinja2-3.1.6.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2805,7 +2805,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/markupsafe-3.0.3.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2821,7 +2821,7 @@
             "LGPL-2.1-only"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pygithub-2.9.1.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2837,7 +2837,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pyjwt-2.12.1.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2853,7 +2853,7 @@
             "Apache-2.0"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pynacl-1.6.2.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2869,7 +2869,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pyyaml-6.0.3.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2885,7 +2885,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/annotated_doc-0.0.4.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2901,7 +2901,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/annotated_types-0.7.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2917,7 +2917,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/anyio-4.13.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2933,7 +2933,7 @@
             "MPL-2.0"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/certifi-2026.4.22.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2949,7 +2949,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/cffi-2.0.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2965,7 +2965,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/charset_normalizer-3.4.7.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2981,7 +2981,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/click-8.4.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2997,7 +2997,7 @@
             "Apache-2.0 OR BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/cryptography-48.0.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3013,7 +3013,7 @@
             "Apache-2.0"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/distro-1.9.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3029,7 +3029,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/fastapi-0.136.1.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3045,7 +3045,7 @@
             "Apache-2.0"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/google_auth-2.53.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3061,7 +3061,7 @@
             "Apache-2.0"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/google_genai-2.4.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3077,7 +3077,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/h11-0.16.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3093,7 +3093,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/httpcore-1.0.9.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3109,7 +3109,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/httptools-0.7.1.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3125,7 +3125,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/httpx-0.28.1.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3141,7 +3141,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/idna-3.15.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3157,7 +3157,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pip-26.1.1.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3173,7 +3173,7 @@
             "Apache-2.0 AND BSD-2-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/prometheus_client-0.25.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3189,7 +3189,7 @@
             "BSD-2-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pyasn1-0.6.3.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3205,7 +3205,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pyasn1_modules-0.4.2.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3221,7 +3221,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pycparser-3.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3237,7 +3237,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pydantic-2.13.4.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3253,7 +3253,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pydantic_settings-2.14.1.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3269,7 +3269,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/pydantic_core-2.46.4.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3285,7 +3285,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/python_dotenv-1.2.2.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3301,7 +3301,7 @@
             "BSD-2-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/python_json_logger-4.1.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3317,7 +3317,7 @@
             "Apache-2.0"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/requests-2.34.2.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3334,7 +3334,7 @@
             "Apache-2.0"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/sniffio-1.3.1.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3350,7 +3350,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/starlette-1.0.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3366,7 +3366,7 @@
             "Apache-2.0"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/tenacity-9.1.4.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3382,7 +3382,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/typing_inspection-0.4.2.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3398,7 +3398,7 @@
             "PSF-2.0"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/typing_extensions-4.15.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3414,7 +3414,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/unidiff-0.7.5.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3430,7 +3430,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/urllib3-2.7.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3446,7 +3446,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/uvicorn-0.47.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3463,7 +3463,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/uvloop-0.22.1.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3479,7 +3479,7 @@
             "MIT"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/watchfiles-1.2.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -3495,7 +3495,7 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "DiffID": "sha256:6cab1bee58318f7587aa0c41e2255cb7e35b08feb21bd90eda1d3cbcb3fdd292"
+            "DiffID": "sha256:fde4775cb5041790ab7a37b040228ea99a2f8a5450df39ca6cf2b8d680dde9b3"
           },
           "FilePath": "app/venv/lib/python3.14/site-packages/websockets-16.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
