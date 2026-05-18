@@ -1,118 +1,117 @@
 # Technical Architecture Deep Dive
 
-This document provides an exhaustive, under-the-hood technical breakdown of the **AutoHeal DevOps Agent's** component design, data flow patterns, security posture, and observability interfaces.
+This document provides a highly detailed, recruiter-ready systems engineering breakdown of the **AutoHeal DevOps Agent's** software component design, stateless branch synchronization, security policies, and high-fidelity serverless telemetry layers.
 
 ---
 
-## 1. Component Map & Interface Topology
+## 1. Cloud-Native Modular Component Topography
 
-AutoHeal is designed as a modular, containerized full-stack platform. It acts as both an automated, CI/CD-linked failure diagnostic runner and a live, interactive engineering control panel:
+The platform is designed to operate completely stateless and database-free, leveraging external cloud APIs, event-driven CI/CD execution environments, and git-as-a-ledger storage mechanisms to remain fully compatible with free-tier resource limits (e.g., Render + Vercel):
 
 ```
-  +-------------------------------------------------------------+
-  |              Next.js 14 Frontend Control Panel              |
-  |  - Dashboard  - Security Gate  - AI Analysis  - Monitoring  |
-  +------------------------------+------------------------------+
-                                 | (Standard Fetch Client / HTTP)
-                                 v
-  +-------------------------------------------------------------+
-  |                FastAPI Backend (v1 Route layer)              |
-  |  - /api/v1/pipelines/runs   - /api/v1/ai/latest-diagnosis    |
-  |  - /api/v1/scans/trivy       - /api/v1/scans/bandit           |
-  +------------------+-----------------------+------------------+
-                     |                       |
-                     v                       v
-            [ReportsService]          [GitHubService]
-                     |                       |
-                     v (Bind Mount)          v (PyGithub)
-            +--------+---------+      +------+-------+
-            |  reports/        |      |  GitHub      |
-            |  ai_diagnosis    |      |  Actions     |
-            |  scan results    |      |  API         |
-            +------------------+      +--------------+
+  +--------------------------------------------------------------+
+  |              Vercel Serverless Next.js 15 Client             |
+  |  - Dashboard  - Security Gate  - AI Analysis  - Telemetry    |
+  +-------------------------------|------------------------------+
+                                  | (REST API Client / HTTPS)
+                                  v
+  +--------------------------------------------------------------+
+  |         Render Stateless FastAPI v1 Core Gateway             |
+  |  - /ai/latest-diagnosis       - /monitoring/summary          |
+  |  - /scans/trivy               - /scans/bandit                |
+  +-------------------+----------------------+-------------------+
+                      |                      |
+                      v                      v
+             [ReportsService]         [GitHubService]
+                      |                      |
+                      v (REST / raw)         v (PyGithub)
+             +--------+---------+     +------+-------+
+             |  GitHub reports  |     |  GitHub      |
+             |  branch storage  |     |  Actions     |
+             |  (reports/      |     |  API         |
+             |   latest/*)      |     |  (runs)      |
+             +------------------+     +--------------+
 ```
 
-### Component Architecture
-1. **Next.js 14 Control Panel**: A highly-polished, dark-theme dashboard designed with the App Router, Lucide icons, and Tailwind CSS. It connects to the backend through a native Fetch Client using typed models, featuring dynamic visual cues like connection health pings, operational gauges, and automated code-remediation clipboard interfaces.
-2. **FastAPI Backend (v1 API Engine)**: Exposed through strict versioned prefixes (`/api/v1/`), it processes requests using thin controller routes that delegate heavy lifting to isolated service layers. All responses conform to a unified Success/Error JSON envelope to ensure stable typing.
-3. **Reports Service Layer (`ReportsService`)**: An isolated module responsible for safe report lookups. It implements strict validation policies, including a **5MB size guard** to protect memory heaps from resource exhaustion attacks.
-4. **GitHub Integration Layer (`GitHubService`)**: Connects to the GitHub Actions REST API via PyGithub to retrieve recent pipeline runs. If credentials are not configured, it gracefully defaults to high-fidelity mock datasets, allowing offline frontend development.
-5. **Observability Stack**: Deployed alongside the API as containerized sidecars:
-   - **Prometheus** (pulls application performance metrics)
-   - **Loki** (ingests application logs)
-   - **Promtail** (scrapes Docker stdout and pushes to Loki)
-   - **Grafana** (renders pre-provisioned kiosks embedded inside the control panel)
+### Component Breakdown
+1.  **Vercel Serverless Next.js 15 Client**: An extremely polished, responsive dark-theme dashboard designed with Next.js 15 App Router, TypeScript, and Tailwind CSS. It communicates securely with the FastAPI backend through a typed REST client, featuring dynamic HSL status badges, loading states, and clipboard config helpers.
+2.  **Render FastAPI ASGI Engine (v1 Router)**: Exposed under strict versioned prefixes (`/api/v1/`), it processes requests using thin controller routes that delegate resource lookups to isolated service layers. All responses conform to a unified enveloped Success/Error JSON model to guarantee stable type checking.
+3.  **Dynamic Reports Service Layer (`ReportsService`)**: An isolated service layer responsible for safe report lookups. 
+    *   *Local Mode*: Seamlessly reads local `reports/` folder JSONs for offline mock sandbox development.
+    *   *Cloud Mode*: Hits the GitHub raw content REST API using authorization tokens to fetch security JSON/SARIF documents from the repository's `reports` branch inside `reports/latest/*`. Includes a **5MB size guard** to protect memory heaps from resource exhaustion attacks.
+4.  **GitHub REST Integration Layer (`GitHubService`)**: Queries the GitHub Actions API via PyGithub to capture live pipeline runs, execution statuses, and links. If credentials are not configured, it gracefully defaults to structured mock runs.
+5.  **In-Memory Metrics Registry**: Instead of running a persistent database sidecar (Prometheus server + Loki logger + Promtail collector + Grafana kiosk container) which eats over 1.5GB of RAM and crashes Render free tier containers, the core FastAPI engine utilizes a **direct in-memory Prometheus scraping parser** to serve metric durations and error rates in milliseconds with **zero database dependencies**.
 
 ---
 
-## 2. Dynamic Repository State Synchronization Loop
+## 2. Dynamic Git-As-A-Ledger Synchronization Loop
 
-One of the platform's core innovations is its **real-time state synchronization loop**, keeping the frontend in lockstep with the actual branch health without relying on complex, latency-prone webhook infrastructures:
+Instead of local file system persistency (which is ephemeral in Render container pods) or complex webhook triggers, the platform implements an **Event-Driven Git-As-A-Ledger Synchronization Loop**:
 
 ```
- Next.js Client             FastAPI Engine v1             GitHub API
-      |                            |                         |
-      |-- GET /ai/latest-diagnosis |                         |
-      |--------------------------->|                         |
-      |                            |-- get_workflow_runs() ->|
-      |                            |------------------------>|
-      |                            |<-- Return active runs --|
-      |                            |-------------------------|
-      |                            |                         |
-      |                            |-- Is conclusion == "success"?
-      |                            |-- YES: Clear old state & Raise 404
-      v                            v                         v
-[ShieldCheck Banner:               |                         |
- "System Fully Healthy"]           |<-- 404 (Success clear) -|
-      |                            |                         |
-      |                            |-- NO: conclusion == "failure"?
-      |                            |-- Load reports/ai_diagnosis.json
-      v                            v                         v
-[Show Gemini Root Cause &          |                         |
- Suggested Remediations]           |<-- 200 (Active Failure)-|
+  Next.js 15 Client            FastAPI Engine v1               GitHub API
+       |                               |                           |
+       |-- GET /ai/latest-diagnosis -->|                           |
+       |                               |-- get_workflow_runs() --->|
+       |                               |<-- Return active runs ----|
+       |                               |                           |
+       |                               |-- Is conclusion == "success"?
+       |                               |-- YES: Clear stale status
+       v                               v                           v
+ [System Fully Healthy                 |<-- 404 (No active failure)-|
+  Green Shield Banner]                 |                           |
+       |                               |-- NO: conclusion == "failure"
+       |                               |-- Fetch reports/latest/ai_diagnosis.json
+       |                               |   from 'reports' branch (cached 90s)
+       v                               v                           v
+ [Render Gemini Diagnosis &            |<-- 200 (Active incident) --|
+  Copyable safe-patch code]            |
 ```
 
-### Loop Mechanics
-1. **Request Ingestion**: When the user loads or refreshes the AI Analysis page, a request is made to `/api/v1/ai/latest-diagnosis`.
-2. **Workflow Check**: The backend calls `GitHubService.get_workflow_runs()` to fetch the latest pipeline executions on GitHub (or mock datasets in dev).
-3. **Synchronization Check**:
-   - **Build Succeeded**: If the latest run's conclusion is `success`, the agent immediately knows the codebase is healthy. It suppresses and ignores any historical `ai_diagnosis.json` logs on the disk and returns `404 Not Found` with the detail: `"No active failures detected. The latest workflow run succeeded."` The frontend captures this and renders a beautiful green **"System Fully Healthy"** banner.
-   - **Build Failed**: If the latest run did indeed fail, the agent reads `reports/ai_diagnosis.json` from the disk, serving the detailed Gemini root-cause analysis and code suggestion. The frontend renders the complete interactive AI diagnostic suite.
+### Loop Architecture & Caching Strategy
+1.  **Request Ingestion**: When the user loads the AI Analysis or Security pages, the Next.js client requests the respective versioned endpoints.
+2.  **Workflow Check**: The backend fetches the latest workflow execution state from the GitHub Actions REST API to verify if the latest build has succeeded or failed.
+3.  **Synchronization Checks**:
+    *   **Build Passed**: If the latest run's conclusion is `success`, the agent immediately knows the code is fully operational. It suppresses and ignores any stale reports in the storage ledger and raises a clean `404 Not Found` with detail `"No active failures detected. The latest workflow run succeeded."` The frontend captures this and transitions into a beautiful, green **"System Fully Healthy"** operational screen.
+    *   **Build Failed**: If the latest run is a failure, the backend fetches `ai_diagnosis.json` (or the scan reports) from the repository's dedicated `reports` branch.
+4.  **90-Second Cache TTL & Stale Fallback**:
+    *   To prevent hitting GitHub API rate-limits during dashboard refreshes, the backend caches report fetches in a lightweight in-memory TTL cache (90 seconds).
+    *   If the GitHub API is temporarily unreachable or rate-limited, the backend gracefully serves the **last successfully cached response (degraded mode)** instead of throwing raw exceptions.
 
 ---
 
-## 3. Hardened Security & Isolation Model
+## 3. Cloud-Native Observability & Metric Scraping
 
-AutoHeal implements a "Defense in Depth" strategy inside the CI/CD pipeline and the running containers:
+### Direct In-Memory Prometheus Scraper
+The FastAPI backend utilizes the `prometheus_client` to record telemetry:
+*   `http_requests_total`: Tracks overall throughput categorized by endpoint path, HTTP method, and status codes.
+*   `http_request_duration_seconds`: SLO-aligned histogram measuring latency percentiles.
 
-### CI/CD Security Gating
-1. **SAST (Static Application Security Testing)**: Bandit scans the Python codebase for vulnerabilities like dangerous SQL/command concatenations, insecure defaults, or raw `assert` statements.
-2. **SCA (Software Composition Analysis)**: `pip-audit` checks `requirements.txt` packages against active CVE databases to prevent supply-chain attacks.
-3. **Container Scanning**: Trivy performs dual checks—scanning the filesystem pre-build and the final Docker image post-build. Pipeline execution terminates on any High or Critical vulnerability.
+When the monitoring endpoint `GET /api/v1/monitoring/summary` is requested, the **`MonitoringService`** loops through the local `REGISTRY.collect()` collectors in memory, parsing total request values, average durations, and error rates dynamically:
+```python
+for metric in REGISTRY.collect():
+    if metric.name == "http_requests_total":
+        for sample in metric.samples:
+            total_requests += int(sample.value)
+```
+This enables **real-time sub-second metrics reporting with absolutely zero storage or database sidecar overhead**.
 
-### Distroless Container Hardening
-The production application container utilizes a shell-less **Chainguard Distroless Python** base runtime:
-- **Zero OS binaries**: There is no `/bin/sh`, `/bin/bash`, or `/bin/ls` inside the runtime container, completely neutralizing whole categories of command injection attacks.
-- **No Package Managers**: `apk`, `apt`, and `pip` are absent, making it impossible for unauthorized processes to fetch external payloads.
-- **Non-Root Execution**: Runs under UID `65532` (`nonroot`), protecting the host kernel from potential namespace escape exploits.
-
----
-
-## 4. High-Fidelity Observability & Cardinality Control
-
-### Metric Collection
-FastAPI exposes runtime performance data via Prometheus at `/metrics`:
-- `http_requests_total`: Tracks raw throughput categorized by path, method, and HTTP status code.
-- `http_request_duration_seconds`: Histogram of response times to spot latency degradations.
-
-### Path Normalization (Preventing Cardinality Explosion)
-To prevent dynamic endpoints (e.g. `/api/v1/scans/123`, `/api/v1/scans/456`) from generating thousands of unique timeseries metrics in Prometheus (known as **Cardinality Explosion**), custom middleware normalizes dynamic routes into a generic format (e.g. `/api/v1/scans/{id}`).
-
-### Request Correlation
-- Custom middleware injects a unique `X-Request-ID` UUID into every incoming request.
-- This ID is automatically injected into all JSON logs printed to `stdout` and returned in HTTP headers.
-- Developers can select a latency spike in Grafana, copy the `request_id`, and query Loki logs to instantly isolate the exact log trace across multi-container flows.
+### Path Normalization (Cardinality Protection)
+To prevent dynamic paths (e.g. `/api/v1/scans/trivy`, `/api/v1/scans/bandit`) from generating an infinite number of unique timeseries metrics inside the Prometheus registry (known as **Cardinality Explosion**), a dynamic path normalizer middleware converts dynamic path parameters into a generic placeholder format (e.g. `/api/v1/scans/{id}`).
 
 ---
 
-[Back to README](../README.md)
+## 4. Multi-Stage CI/CD Security Gating
+
+The platform enforces rigorous container and application security checks within the GitHub Actions runner environments:
+
+### CI/CD Security Gates
+1.  **SAST (Static Application Security Testing)**: Bandit scans the Python backend codebase for dangerous concatenations, raw SQL strings, and shell execution vulnerabilities.
+2.  **SCA (Software Composition Analysis)**: `pip-audit` cross-checks all backend requirements against active national vulnerability databases.
+3.  **Container Scans (Trivy)**: Scans the target filesystem and final Docker image post-build. Workflow execution terminates on any high or critical severity CVE, and generated reports are pushed automatically to the `reports` branch.
+
+### Chainguard Shell-less Hardening
+The production API container runs on a shell-less, package manager-free **Chainguard Distroless Python** base image:
+*   **No shell `/bin/sh` or `/bin/bash`**: Prevents terminal session hijacking.
+*   **No `apk` / `apt` / `pip` packages**: Bypasses dynamic remote execution downloads.
+*   **Non-Root Namespace**: Executes strictly as UID `65532` (`nonroot`), protecting host kernels from namespace escape vulnerabilities.

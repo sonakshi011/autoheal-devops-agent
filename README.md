@@ -1,103 +1,182 @@
 # 🤖 AutoHeal DevOps Agent
 
-[![Next.js 14](https://img.shields.io/badge/Frontend-Next.js%2014-black?logo=next.js)](https://nextjs.org/)
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-emerald?logo=fastapi)](https://fastapi.tiangolo.com/)
-[![Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini-blue?logo=google-gemini)](https://aistudio.google.com/)
-[![Security: Trivy](https://img.shields.io/badge/Security-Trivy-blueviolet?logo=aquasecurity)](https://github.com/aquasecurity/trivy)
-[![Security: Bandit](https://img.shields.io/badge/Security-Bandit-yellow)](https://github.com/PyCQA/bandit)
-[![Runtime: Distroless](https://img.shields.io/badge/Runtime-Distroless-success)](https://github.com/chainguard-images/images)
+[![Vercel Control Panel](https://img.shields.io/badge/Frontend-Vercel%20Next.js%2015-black?logo=vercel)](https://autoheal-devops-agent.vercel.app)
+[![Render FastAPI Core](https://img.shields.io/badge/Backend-Render%20FastAPI%20v1-emerald?logo=render)](https://autoheal-api.onrender.com/docs)
+[![AI Engine: Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini-blue?logo=google-gemini)](https://aistudio.google.com/)
+[![Security Gates: Trivy](https://img.shields.io/badge/Security-Trivy-blueviolet?logo=aquasecurity)](https://github.com/aquasecurity/trivy)
+[![Security Gates: Bandit](https://img.shields.io/badge/Security-Bandit-yellow?logo=python)](https://github.com/PyCQA/bandit)
+[![Base Hardening: Chainguard](https://img.shields.io/badge/Base-Chainguard%20Distroless-success?logo=docker)](https://github.com/chainguard-images/images)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**AutoHeal DevOps Agent** is a production-ready, full-stack, AI-native DevSecOps platform designed to automate and streamline the software delivery and self-healing lifecycle. 
+**AutoHeal DevOps Agent** is a production-operational, recruiter-grade AI-native DevSecOps automation platform that orchestrates real-time static code audits, container security composition analysis, and event-driven pipeline self-healing.
 
-It provides engineers with a highly polished, responsive **Next.js 14 Control Panel** integrated with a **FastAPI v1 backend**, orchestrating **Google Gemini AI** failure diagnosis, real-time GitHub Actions workflow state synchronization, zero-vulnerability container runtime environments, and embedded Grafana telemetry.
+The platform couples a responsive **Next.js 15 Control Panel** with a stateless **FastAPI v1 API Gateway**, leveraging **Google Gemini AI** failure diagnostics, serverless Prometheus telemetry dashboards, and a specialized **GitHub `reports` branch synchronization loop** for seamless cloud persistence.
 
 ---
 
-## 🏗️ Technical Architecture
+### 🌐 Live Production Links
+*   **Production Control Panel**: [https://autoheal-devops-agent.vercel.app](https://autoheal-devops-agent.vercel.app)
+*   **Production API Gateway**: [https://autoheal-api.onrender.com](https://autoheal-api.onrender.com)
+*   **API Swagger Documentation**: [https://autoheal-api.onrender.com/docs](https://autoheal-api.onrender.com/docs)
 
-The platform is architected with a "Security-First" and "Observability-Always" mindset, linking five core dimensions into a cohesive runtime environment:
+---
+
+## 🏗️ Technical Architecture & Telemetry Loop
+
+The platform is designed with a **stateless, zero-disk dependency model** to run efficiently on standard free-tier limits, decoupling telemetry and reporting into separate event-driven domains:
 
 ```mermaid
 graph TB
-    subgraph "Next.js 14 Control Panel (Host: 3000)"
-        UI[React Client Shell]
-        DB_PG[Dashboard Page]
+    subgraph "Vercel Serverless (https://autoheal-devops-agent.vercel.app)"
+        UI[Next.js 15 Control Panel]
+        MN_PG[Telemetry Dashboard]
         SC_PG[Security Gate Page]
         AI_PG[AI Analysis Page]
-        MN_PG[Telemetry iframe]
     end
 
-    subgraph "Docker Compose Multi-Container Stack"
-        API[FastAPI Backend Engine :8000]
-        PROM[Prometheus :9090]
-        LOKI[Loki Log Aggregator :3100]
-        PROMTAIL[Promtail Scraper]
-        GRAF[Grafana Kiosk Dashboard :3001]
+    subgraph "Render Cloud Stateless Container (https://autoheal-api.onrender.com)"
+        API[FastAPI Gateway Engine]
+        REG[In-Memory Prometheus Registry]
+        CACHE[Memory TTL Cache]
     end
 
-    subgraph "External Integrations"
-        GH_API[GitHub Actions Runs API]
-        GEM_API[Google Gemini AI Engine]
+    subgraph "GitHub DevSecOps Pipelines (Action Runners)"
+        TEST_RUN[CI Pipeline failing logs]
+        TRIVY[Trivy Scan Results]
+        BANDIT[Bandit SAST Results]
+        GEMINI[Gemini AI Orchestrator]
     end
 
-    subgraph "Persistent Filesystem"
-        REP_DIR[(Host ./reports : Container /app/reports)]
+    subgraph "GitHub Branch-Based Storage"
+        BRANCH[(reports Branch: reports/latest/*)]
     end
 
-    %% Frontend Interactions
-    UI --> DB_PG & SC_PG & AI_PG & MN_PG
-    DB_PG -- "fetch /api/v1/pipelines/runs" --> API
+    %% Client Calls
+    UI --> MN_PG & SC_PG & AI_PG
+    MN_PG -- "fetch /api/v1/monitoring/summary" --> API
     SC_PG -- "fetch /api/v1/scans/*" --> API
     AI_PG -- "fetch /api/v1/ai/latest-diagnosis" --> API
-    MN_PG -- "Secure anonymous iframe load" --> GRAF
 
-    %% Backend Service Layer
-    API -- "GitHubService" --> GH_API
-    API -- "ReportsService (Safe size checks)" --> REP_DIR
-    API -- "Prometheus Middleware" --> PROM
+    %% Backend Services
+    API -- "Direct registry parse" --> REG
+    API -- "Requests contents API with 90s TTL" --> CACHE
+    CACHE -- "Read/Write raw raw JSONs" --> BRANCH
 
-    %% Observability Stream
-    PROMTAIL -- "Scrapes Docker socket" --> LOKI
-    LOKI & PROM --> GRAF
-    
-    %% AI Pipeline Runner (scripts/analyze_failure.py)
-    GH_API -- "Download failed logs" --> GEM_API
-    GEM_API -- "GeminiDiagnosisOutput" --> REP_DIR
+    %% DevSecOps pipeline push
+    TRIVY & BANDIT & GEMINI -- "Commit reports & [skip ci]" --> BRANCH
 ```
 
 ---
 
-## 🚀 Key Features
+## 💡 "Why This Architecture?" — Systems Engineering Thinking
 
-*   **🧠 Dynamic AI Analysis & GitHub Synchronization**: Automatically parses failed CI/CD workflow logs via Gemini. If the latest build succeeds, the API automatically clears historical stale data, transitioning the Control Panel into a beautiful, green **"System Fully Healthy"** operational screen.
-*   **🛡️ Multi-Stage DevSecOps Pipeline**: Integrated static application security testing (**Bandit SAST**), software composition analysis (**pip-audit SCA**), and container scanning (**Trivy FS/Image**) that block pipeline progression on any High/Critical CVE.
-*   **📦 Hardened Zero-CVE Base**: Multi-stage Docker builds compiled over shell-less **Chainguard Distroless Python** base runtimes, eliminating 100% of standard OS shell-injection vectors.
-*   **📊 Embedded Iframe Telemetry**: Embedded, dark-themed Grafana kiosk dashboards running anonymously on host port `3001` to view live request rates, error rates (5xx %), P95 latencies, and Promtail log streams in real-time.
-*   **🔍 Correlation Traceability**: Full request lifecycle correlation utilizing custom `X-Request-ID` middleware, letting you trace singular client calls across metrics, logs, and trace aggregates instantly.
+Every architectural choice in the AutoHeal platform was driven by strict cloud-native constraints, optimizing for statelessness, resource efficiency, and zero operational overhead:
+
+### 1. Why the `reports` Git Branch was chosen for storage?
+*   *The Problem*: Render and Vercel container filesystems are strictly ephemeral; any reports written to a local folder disappear on the next scale-out or container restart. 
+*   *The Engineering Solution*: Instead of introducing a complex database cluster or expensive AWS S3 storage buckets, the platform utilizes a dedicated, stateless git branch (`reports`) as an **immutable, version-controlled audit ledger**. GitHub Actions commits reports directly to `reports/latest/*` and `reports/history/YYYY-MM-DD/*`. The FastAPI backend dynamically fetches these JSONs via raw API payloads. This ensures **100% data persistence, native auditing, and complete zero-cost maintenance**.
+
+### 2. Why Serverless Telemetry & No Heavy Grafana Stack?
+*   *The Problem*: Running a traditional multi-container sidecar stack (Prometheus database + Loki logging + Promtail collector + Grafana kiosk container) consumes over 1.5GB of RAM, easily causing Out-Of-Memory (OOM) crashes on 512MB RAM free-tier limits.
+*   *The Engineering Solution*: We bypassed database operations completely by writing an **In-Memory Prometheus Registry Middleware Parser** inside FastAPI. When the frontend requests `/api/v1/monitoring/summary`, the backend reads the active process metrics, HTTP request counters, and durations directly from RAM in milliseconds. This provides **real-time metrics, sub-second latency, and zero persistent database overhead**.
+*   *No Grafana*: We compiled custom, responsive telemetry widgets natively into Next.js 15 using Lucide icons and progress rings. This eliminates complex X-Frame-Options anonymous iframe hacks and creates a premium, unified developer UX that loads instantly.
+
+### 3. Why the Vercel + Render Split Deployment?
+*   *Frontend (Vercel)*: Deployed as serverless edge functions to guarantee ultra-fast globally distributed client delivery, automatic static site optimizations, and seamless continuous integrations.
+*   *Backend (Render)*: Deployed as a persistent web service, allowing the multi-threaded FastAPI engine to run uninterrupted, maintain in-memory TTL caching, and expose clean ASGI swagger endpoints.
+
+### 4. Why GitHub Actions Orchestration?
+*   *Decoupled Compute*: Heavy security static auditing (Bandit SAST, Trivy FS container scans) and LLM generative runs are executed entirely inside ephemeral GitHub-hosted runners. This keeps the core API extremely lightweight, ensuring that long-running security evaluations never block client requests or degrade API response SLA thresholds.
 
 ---
 
-## 🛠️ Tech Stack
+## 📸 Chronological Self-Healing Lifecycle
 
-| Category | Technology |
+This chronology demonstrates the end-to-end event-driven self-healing pipeline of the AutoHeal platform:
+
+### Step 1: CI Pipeline Incident Detection
+When a developer pushes broken formatting or code changes that break unit tests, the GitHub Actions CI pipeline instantly isolates the incident.
+![01_lint_check_failure](docs/images/01_lint_check_failure.png)
+*Figure 1: GitHub Actions CI pipeline captures a formatting check failure.*
+
+### Step 2: Static Analysis Audit Isolation
+The pipeline fails during Ruff compilation checks, preventing broken code from progressing to subsequent staging or build phases.
+![02_ruff_format_logs](docs/images/02_ruff_format_logs.png)
+*Figure 2: Ruff formatting logs capturing the precise code files requiring remediation.*
+
+### Step 3: Event-Driven Unit Test Failures
+Similarly, any unit test crash triggers the analyzer, ensuring no broken logic makes it to production.
+![03_unit_test_failure](docs/images/03_unit_test_failure.png)
+*Figure 3: CI Pipeline unit test checks failing popup.*
+
+### Step 4: AI Failure Analyzer Orchestration
+Upon capturing a build crash, the event-driven orchestrator triggers our Google Gemini AI failure analysis script, generating a rich root cause diagnosis.
+![04_ai_analyzer_trigger](docs/images/04_ai_analyzer_trigger.png)
+*Figure 4: Automated, isolated execution of the Gemini AI failure diagnostic runner.*
+
+### Step 5: High-Fidelity AI Root Cause Diagnosis
+Developers open the **AI Analysis** panel on their Next.js Control Panel to find the precise failure explanation, suggested remediations, and copyable safe-patch configurations!
+![08_ai_root_cause_analysis](docs/images/08_ai_root_cause_analysis.png)
+*Figure 5: Next.js 15 control panel rendering Gemini-driven root cause failure intelligence.*
+
+### Step 6: Fully Resolved / Healed PR State
+Once the developer applies the suggested patch, all pipeline gates successfully compile to a 100% green passing state!
+![05_healed_pr_checks_pass](docs/images/05_healed_pr_checks_pass.png)
+*Figure 6: Pull Request healed, passing all DevSecOps static and unit test gates.*
+
+### Step 7: Real-Time Dynamic Healing Verification
+The FastAPI gateway automatically captures the successful workflow status, suppresses any historical failure reports from the active branch cache, and directs the Next.js control panel to render a clean, green operational banner:
+![12_system_fully_healthy](docs/images/12_system_fully_healthy.png)
+*Figure 7: The AI Analysis screen transitions dynamically into a green system-healthy state.*
+
+---
+
+## 📊 Live Cloud-Native Monitoring & Telemetry
+
+Our custom-built **Cloud-Native Telemetry Dashboard** fetches live Prometheus metrics, pipeline incident tracking registers, and Trivy security severity balances directly in-memory from Render APIs:
+
+![10_cloud_native_monitoring](docs/images/10_cloud_native_monitoring.png)
+*Figure 7: High-fidelity cloud-native operational telemetry dashboard.*
+
+### 🔍 Operational Telemetry Breakdown:
+1.  **API Gateway Status**: Exposes live heartbeats, API error rates, and average endpoint durations using the in-memory Prometheus scraping parser.
+2.  **CI/CD Pipeline Operational State**: Displays actual workflow success rate percentages (e.g., `85.71%`) and dynamic warning/healthy badges.
+3.  **Active Incident Tracking**: Lists the exact failed workflows, execution timestamps, and direct external links to GitHub Action execution logs.
+4.  **Security Scans Telemetry**: Visualizes Trivy vulnerabilities and Bandit SAST findings, breaking them down into Critical, High, Medium, and Low severity balances.
+
+### 🛡️ Security Gate & Zero-Vulnerability Enforcement
+Our Next.js 15 Control Panel features a dedicated **Security Gate** displaying active Trivy container CVE findings and Bandit SAST issues parsed directly from raw payloads committed to our stateless reports ledger:
+![11_security_gate_vulnerabilities](docs/images/11_security_gate_vulnerabilities.png)
+*Figure 9: Next.js 15 Control Panel Security Gate rendering a PostgreSQL/postcss medium-severity vulnerability.*
+
+---
+
+## 🛠️ Technology Stack & Hardening
+
+| Component | Stack Specification |
 |---|---|
-| **Frontend** | React 18, Next.js 14 (App Router), Tailwind CSS, Lucide icons, shadcn/ui |
-| **Backend** | Python 3.12, FastAPI, Uvicorn, PyGithub, Pydantic v2 (BaseSettings) |
-| **AI Core** | Google Gemini API (gemini-2.5-flash / gemini-2.5-pro) |
-| **Observability** | Prometheus, Loki, Promtail, Grafana (Kiosk Mode provisioned) |
-| **Security Gates** | Trivy (FS & Image), Bandit (SAST), pip-audit (SCA) |
-| **Infrastructure** | Docker, Docker Compose, Multi-stage Chainguard Distroless containers |
+| **Frontend Platform** | React 18, Next.js 15 (App Router), TypeScript, Tailwind CSS, Lucide icons |
+| **Backend Core** | Python 3.12, FastAPI ASGI, Uvicorn, Pydantic v2 (BaseSettings), PyGithub |
+| **AI Orchestration** | Google Gemini API (gemini-2.5-flash / gemini-2.5-pro) |
+| **Telemetry & Metrics**| Prometheus Registry scrapers (ASGI), in-memory TTL caching |
+| **DevSecOps Gates** | Trivy (FS & Image), Bandit (SAST), pip-audit (SCA) |
+| **Security Hardening** | Multi-stage Docker files, Chainguard Shell-less Distroless Python bases |
+
+### 🔒 Base Container Security Hardening
+The backend container runs on a hardened, shell-less **Chainguard Distroless Python** base:
+*   **Zero OS Shells**: Bypasses Command Injections by removing `/bin/sh` and `/bin/bash`.
+*   **No Package Managers**: `apk`, `apt`, and `pip` are completely stripped from the production image.
+*   **Non-Root Namespace**: Runs strictly as UID `65532` (`nonroot`), protecting host kernels from possible namespace escapes.
 
 ---
 
-## 🚦 Quick Start Guide
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-- Docker & Docker Compose
-- Node.js 18+ (for local frontend dev)
-- Google Gemini API Key ([Get one here](https://aistudio.google.com/app/apikey))
-- GitHub Personal Access Token (for workflow runs integration)
+*   Node.js 18+ (for local frontend dashboard)
+*   Python 3.12+ (for backend)
+*   Google Gemini API Key ([Get one here](https://aistudio.google.com/app/apikey))
+*   GitHub Personal Access Token (with `repo` permissions to fetch workflows)
 
 ### Step 1: Environment Configuration
 Create a `.env` file in the project root:
@@ -109,68 +188,48 @@ LOG_LEVEL=INFO
 # GitHub Credentials (used to fetch live workflows)
 GITHUB_TOKEN=your_github_token_here
 GITHUB_REPOSITORY=your_username/your_repository_name
-
-GRAFANA_ADMIN_PASSWORD=autoheal
 ```
 
 Create a `frontend/.env.local` file inside the `frontend/` directory:
 ```env
+# Point to your local backend or production Render API URL
 NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_GRAFANA_URL=http://localhost:3001
-NEXT_PUBLIC_LOKI_URL=http://localhost:3100
 ```
 
-### Step 2: Build and Run the Stack
-Start the core services (API, Prometheus, Loki, Promtail, Grafana):
-```bash
-docker compose up -d --build
-```
+### Step 2: Backend Setup
+1.  **Create Virtual Environment & Install Dependencies**:
+    ```bash
+    python -m venv .venv
+    .venv\Scripts\activate  # On macOS/Linux: source .venv/bin/activate
+    pip install -r requirements.txt
+    ```
+2.  **Run FastAPI Backend Dev Server**:
+    ```bash
+    python -m uvicorn app.main:app --reload --port 8000
+    ```
+    *Open the interactive API Swagger Documentation at [http://localhost:8000/docs](http://localhost:8000/docs).*
 
-### Step 3: Run the Next.js Frontend
-In a separate terminal, start the Next.js dev server:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Step 4: Verify End-to-End Health
-- **Next.js Control Panel**: [http://localhost:3000](http://localhost:3000)
-- **FastAPI Backend Core**: [http://localhost:8000/health/](http://localhost:8000/health/)
-- **Prometheus Metrics**: [http://localhost:8000/metrics](http://localhost:8000/metrics)
-- **Grafana Server**: [http://localhost:3001](http://localhost:3001) (Loaded natively as a kiosk inside the control panel)
+### Step 3: Frontend Dashboard Setup
+1.  **Install Node Modules**:
+    ```bash
+    cd frontend
+    npm install
+    ```
+2.  **Run Next.js Dev Server**:
+    ```bash
+    npm run dev
+    ```
+    *Open the Control Panel at [http://localhost:3000](http://localhost:3000).*
 
 ---
 
-## 📊 Live Observability Specifications
-
-The platform includes a pre-configured, auto-provisioned **AutoHeal Overview** dashboard in Grafana (accessible directly in the Next.js Monitoring view):
-
-- **Request Throughput**: Continuous gauge tracking current req/s rate.
-- **P95 / P99 Latency**: Microsecond-resolution histograms measuring API response overhead.
-- **Error Rates**: Active trackers graphing 4xx and 5xx response ratios.
-- **Application Log Stream**: Native Loki-Scraped log output, filterable and searchable in real-time.
-
----
-
-## 🛡️ Container Hardening & Security
-
-AutoHeal implements elite-tier container practices:
-- **No Shell (`/bin/sh` or `/bin/bash` removed)**: Prevents attackers from initiating interactive sessions in the container.
-- **No Package Manager (`apk` / `apt` / `pip` removed)**: Bypasses container remote package execution.
-- **Non-Root Runtime**: Containers execute natively as UID `65532` (`nonroot`), protecting host namespaces from potential escape vulnerabilities.
-
----
-
-## 📖 Deep-Dive Documentation
-
-Explore our exhaustive engineering guides:
-- [📖 Technical Architecture](docs/architecture.md) — Under-the-hood components and synchronization loops.
-- [🚀 Deployment Guide](docs/deployment-guide.md) — Standardized deployment setups.
-- [🔍 API Guide](docs/api-guide.md) — Versioned route schemas and standard envelopes.
-- [🛠️ Troubleshooting Guide](docs/troubleshooting.md) — Real-world issue catalog and resolution steps.
-- [💬 Technical Interview Prep](docs/interview-qa.md) — High-level Q&A covering the final system.
-- [📄 Resume & LinkedIn Descriptions](docs/resume-project-description.md) — ATS-optimized impact statements.
+## 📖 Complete Engineering Documentation Guides
+*   [📖 Technical Architecture Deep-Dive](docs/architecture.md) — Under-the-hood synchronization loops, cache TTLs, and statelessness.
+*   [🚀 Deployment & Setup Guide](docs/deployment-guide.md) — Multi-environment setups, Render environments, and branch configurations.
+*   [🔍 API Endpoint Specifications](docs/api-guide.md) — Swagger endpoints, requests schemas, and standardized envelopes.
+*   [🛠️ Technical Troubleshooting Guide](docs/troubleshooting.md) — Diagnostic strategies and permissions fixes.
+*   [💬 Recruiters Technical Interview Q&As](docs/interview-qa.md) — System design Q&As covering the final architecture.
+*   [📄 ATS-Optimized Resume Descriptions](docs/resume-project-description.md) — High-impact resume bullet points.
 
 ---
 

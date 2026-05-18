@@ -1,61 +1,42 @@
-# Advanced Technical Interview Q&A
+# Recruiter & Technical Interview Q&As
 
-This document compiles technical Q&As covering the **AutoHeal DevOps Agent's** component architecture, security design, full-stack synchronization loops, and observability integration. Use this to prepare for senior DevOps, DevSecOps, or Full-Stack Engineering interviews.
-
----
-
-## 🏗️ 1. Full-Stack Component Architecture
-
-### Q: Why did you decide to build a dedicated Next.js 14 Control Panel rather than relying purely on CLI runs or simple FastAPI static templates?
-**A**: While CLIs and static HTML templates are fine for simple tasks, a production-grade DevSecOps platform requires an interactive, user-friendly control panel to make telemetry and vulnerability gates actionable. Next.js 14 (App Router) allowed me to build a highly-polished, dark-theme-first dashboard using a component-based model. By coupling it with a thin FastAPI v1 backend, I separated UI representation from operational execution, enabling dynamic metrics, clipboard code suggestions, and security visualizations in real-time.
-
-### Q: Why did you enforce a versioned route schema and standardized response envelopes?
-**A**: In a production environment, API contracts must be extremely stable. I used versioned routes (e.g. `/api/v1/scans/trivy`) to prevent breaking the frontend client if backend logic changes in the future. Furthermore, I enforced a unified response envelope model:
-- **Success**: `{"success": true, "data": {}, "timestamp": ""}`
-- **Error**: `{"success": false, "error": "message", "timestamp": ""}`
-
-By standardizing these envelopes, I eliminated client-side typing instability, simplified the native fetch handler, and ensured that Starlette validation errors are caught globally in `app/main.py` and wrapped in the same clean format, making frontend parsing incredibly predictable.
+This document compiles high-level systems design and engineering Q&As covering the final deployed production architecture of the **AutoHeal DevOps Agent** platform. Use this guide to prepare for Senior DevOps, Cloud, and AI Platform Engineering portfolio reviews.
 
 ---
 
-## 🛡️ 2. Container Hardening & Docker Bind Volumes
-
-### Q: What is a "Distroless" container runtime, and how did you implement it?
-**A**: Distroless containers contain only the application and its direct runtime dependencies. They lack shells (`/bin/sh` or `/bin/bash`), package managers, or standard Linux terminal utilities. I implemented a multi-stage Docker build utilizing **Chainguard Distroless Python** as the final base runtime stage. By compiling dependencies inside a developer builder image and copying only the virtual environment into the distroless image, the container has zero OS binaries. Even if an attacker finds an injection vulnerability in the code, they have no terminal binary to execute, neutralizing the exploit.
-
-### Q: When deploying the FastAPI backend inside Docker, how did you ensure that reports generated on the host are accessible to the API?
-**A**: Because distroless images are stripped of all non-essentials and do not copy host filesystem changes post-build, the container directory `/app/reports` would normally be empty, causing `404 Not Found` API errors. I resolved this by mounting the host reports folder using a **persistent bind volume** in `docker-compose.yml`:
-```yaml
-    volumes:
-      - ./reports:/app/reports
-```
-This maps host `./reports` directly to container `/app/reports`, ensuring that whenever the Trivy/Bandit scanners run or the Gemini engine writes an AI diagnosis, it is instantly readable by the FastAPI service layer.
+### Q1: How did you solve persistent storage limitations for report documents in ephemeral container environments?
+**Answer**: 
+*   **The Challenge**: In serverless edge (Vercel) and stateless container (Render) environments, the local filesystem is ephemeral. Any security report or AI diagnosis generated disappears instantly when the container scales or restarts.
+*   **The Design**: We implemented a **Git-as-a-Ledger reports synchronization strategy**. We decoupled heavy audits into GitHub Actions runners and configured them to commit the generated scan JSONs/SARIFs directly to a dedicated, stateless `reports` git branch (`reports/latest/*`).
+*   **The Ingestion**: The FastAPI backend dynamically fetches these JSON payloads directly via GitHub contents REST APIs. This completely eliminates database licensing, maintenance, or S3 bucket operational costs, while providing **native versioning, immutability, and 100% free persistence**.
 
 ---
 
-## 📊 3. Telemetry, Anonymous iframe & Security Headers
-
-### Q: How did you embed Grafana dashboards inside your Next.js control panel without triggering clickjacking blocking or credentials gates?
-**A**: By default, Grafana blocks iframe embedding to prevent clickjacking attacks (via `X-Frame-Options: deny`) and requires an administrator login. To bypass these limitations while preserving secure, read-only access, I overrode Grafana's default configurations inside `docker-compose.yml`:
-1.  Set `GF_SECURITY_ALLOW_EMBEDDING=true` to force Grafana to allow iframe displays.
-2.  Set `GF_AUTH_ANONYMOUS_ENABLED=true` to enable login-free viewing.
-3.  Set `GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer` to assign anonymous users secure, read-only permissions.
-4.  Mapped the frontend's iframe URL to Grafana's host port `3001` using `kiosk` parameters (e.g. `/d/autoheal-overview-v1/autoheal-platform-overview?orgId=1&refresh=5s&theme=dark&kiosk`) to strip Grafana's navigation bars, delivering a seamless embedded experience.
-
-### Q: How do you prevent "Cardinality Explosion" in Prometheus?
-**A**: In Prometheus, unique label values generate separate timeseries records. If the API logs raw paths containing variable IDs (like `/api/v1/scans/1`, `/api/v1/scans/2`), Prometheus will run out of memory. I implemented a **Path Normalizer** middleware. It uses regex to replace specific numerical IDs with generic placeholders (e.g. `{id}`). This keeps the total count of Prometheus timeseries small, predictable, and low-cardinality.
+### Q2: How does the platform avoid Out-Of-Memory (OOM) crashes on 512MB RAM free-tier cloud limits?
+**Answer**:
+*   **The Challenge**: Running standard Prometheus database servers, Loki log servers, Promtail daemons, and Grafana kiosks eats up over 1.5GB of RAM, immediately triggering container OOM (Out-Of-Memory) kills on free-tier limits.
+*   **The Design**: We engineered an **In-Memory Prometheus Registry Scraper** inside FastAPI using `prometheus_client`. The backend tracks HTTP request counts, durations, and status codes directly inside FastAPI memory space.
+*   **The Scraper**: When the client fetches `/api/v1/monitoring/summary`, the backend queries `REGISTRY.collect()` on-demand, doing a sub-second calculation and returning real-time latency stats in milliseconds with **absolutely zero disk operations or running database sidecars**.
 
 ---
 
-## 🤖 4. Real-Time Repository Synchronization Loops
-
-### Q: How does the AI Analysis page know when a build is healthy, and how does it prevent rendering old failure data?
-**A**: To avoid introducing complex webhook listener infrastructures or state engines, I built a lightweight **repository synchronization loop** directly into the `/api/v1/ai/latest-diagnosis` endpoint. 
-When the user visits or refreshes the AI Analysis page:
-1.  The backend queries the latest workflow run via PyGithub.
-2.  If the latest run's conclusion is `success`, the backend immediately knows the pipeline is healthy. It suppresses any stale `ai_diagnosis.json` report present on the filesystem and returns a `404 Not Found` explaining that all workflows are healthy.
-3.  The Next.js client intercepts this 404 and transitions the UI to a green **"System Fully Healthy"** operational screen with a pulsing `ShieldCheck` icon, dynamically clearing historical logs automatically!
+### Q3: How do you prevent hitting GitHub Actions API rate-limits during rapid client refreshes?
+**Answer**:
+*   **The Design**: We implemented a **Memory TTL Cache (90 Seconds)** inside our `ReportsService`. 
+*   **The Cache**: When a client requests a security scan or AI diagnosis report, the FastAPI backend checks if an active cache entry exists and is less than 90 seconds old. If yes, it serves the cached JSON instantly. 
+*   **The Fallback**: If the cache expires but a GitHub API lookup temporarily fails or rate-limits, the backend gracefully serves the **last successfully cached response (stale-while-revalidate degraded mode)** instead of crashing with unhandled exceptions.
 
 ---
 
-[Back to README](../README.md)
+### Q4: How is the backend container secured against interactive terminal attacks?
+**Answer**:
+*   **The Design**: The API Docker image is compiled using a multi-stage build, launching on a hardened **Chainguard Shell-less Distroless Python** base runtime.
+*   **The Posture**: Distroless images strip out **100% of standard OS shells (`/bin/sh`, `/bin/bash`), core utils, and package managers (`apk`, `apt`, `pip`)**. If an attacker gains unauthorized endpoint access, there is no shell available to execute commands or download malicious payloads. The container also runs under UID `65532` (`nonroot`), protecting host kernels from potential namespace exploits.
+
+---
+
+### Q5: Why did you split frontend and backend deployments across Vercel and Render?
+**Answer**:
+*   **The Design**: We optimized for specialized cloud runtimes. 
+*   **Frontend (Vercel)**: Leverages Serverless Edge delivery for instantaneous, globally-cached React client rendering.
+*   **Backend (Render)**: Runs a persistent, multi-threaded FastAPI web service, which allows the ASGI event loop to handle continuous traffic, manage backend memory TTL caches, and expose Swagger API controllers securely.
