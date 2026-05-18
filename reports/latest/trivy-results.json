@@ -3,16 +3,16 @@
   "Trivy": {
     "Version": "0.70.0"
   },
-  "ReportID": "019e3b46-c63d-752a-b9ae-abe5d1cb2adb",
-  "CreatedAt": "2026-05-18T13:29:14.557339996Z",
-  "ArtifactID": "sha256:4773316a69b67bb76e5c82719759e063f9681fbeee4b519e96224d6c345c6de2",
+  "ReportID": "019e3b6e-52db-73f4-8813-21aa954a42d3",
+  "CreatedAt": "2026-05-18T14:12:26.459260186Z",
+  "ArtifactID": "sha256:260a27a405064c173942f70986aead4bf6c1cfab860646db40ed08aaa34a42db",
   "ArtifactName": ".",
   "ArtifactType": "repository",
   "Metadata": {
     "RepoURL": "https://github.com/sonakshi011/autoheal-devops-agent",
     "Branch": "main",
-    "Commit": "0e6ce22d911d506a7f482e88a2e2619214480db0",
-    "CommitMsg": "feat: implement cloud-native operational telemetry dashboard",
+    "Commit": "e2ac789342e8ca8d305887aa1e36728bcd63be0d",
+    "CommitMsg": "docs: modernize production architecture documentation",
     "Author": "sonakshi011 \u003csonakshissharma01@gmail.com\u003e",
     "Committer": "sonakshi011 \u003csonakshissharma01@gmail.com\u003e"
   },
@@ -1327,7 +1327,7 @@
             "Name": "GitHub Security Advisory npm",
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
           },
-          "Fingerprint": "sha256:5550f8e681fb985847bdd2d71960a03ed64c61684a7f5501bdae0134e5f78ac5",
+          "Fingerprint": "sha256:4bf938798e0b9c3fa298171d431990756fb9d5934ab0e550e785d5cb26956903",
           "Title": "postcss: PostCSS: Cross-Site Scripting (XSS) via improper escaping of style closing tags",
           "Description": "PostCSS takes a CSS file and provides an API to analyze and modify its rules by transforming the rules into an Abstract Syntax Tree. Versions prior to 8.5.10 do not escape `\u003c/style\u003e` sequences when stringifying CSS ASTs. When user-submitted CSS is parsed and re-stringified for embedding in HTML `\u003cstyle\u003e` tags, `\u003c/style\u003e` in CSS values breaks out of the style context, enabling XSS. Version 8.5.10 fixes the issue.",
           "Severity": "MEDIUM",
